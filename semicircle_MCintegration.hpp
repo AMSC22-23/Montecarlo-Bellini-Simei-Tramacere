@@ -5,25 +5,25 @@
 
 int MC_integration(int n, double radius) {
 
-        //Monte Carlo integration of f=1 over a semicircle of radius "radius"
+        double x, y;
+        double integral;
+        double sum=0;
 
-        int i;
-        double x,y;//coordinates of points
-        double integral;//approximation of the integral
-        double sum =0; //value of function at points inside circle
+        std::random_device rd;
 
-        std::default_random_engine generator{124321};
-        for( i = 0; i < n; i++) {
-                std::uniform_real_distribution<double> distribution(0.0,sqrt(radius));
-                x = distribution(generator);
-                y = distribution(generator);
-                if( x*x + y*y <= radius) {
+        std::default_random_engine eng( rd() );
+        for( int i = 0; i < n; ++i ) {
+                std::uniform_real_distribution<double> distribution(0.0,radius);
+                x = distribution(eng);
+                y = distribution(eng);
+                if ( pow(x,2) + pow(y,2) <= pow(radius,2) ) {
                         sum += 1;
                 }
         }
 
         integral = (2.0*radius*radius/(double)n)*(sum);
-        std::cout << "area is approximately: " << integral << std::endl;
+        std::cout << "--------------------------------------------------------" << std::endl;
+        std::cout << "The approximate result of your integral is: " << integral << std::endl;
 
         return 0;
 }
