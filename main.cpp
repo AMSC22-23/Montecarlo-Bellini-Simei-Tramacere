@@ -1,9 +1,10 @@
 #include <iostream>
+#include <string>
 
 int main() {
-    String name;
+    std::string name;
     std::cout << "What's your name?" << std::endl;
     std::cin >> name;
-    std::cout << "Hello" << name << "!" << std::endl;
+    std::cout << "Hello " << name << "!" << std::endl;
     return 0;
 }
