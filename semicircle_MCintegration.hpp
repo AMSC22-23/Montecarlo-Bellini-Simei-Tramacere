@@ -6,13 +6,13 @@
 
 int MC_integration(int dim) {
 
-        int n=10000000;// number of points
+        int n=1000000;// number of points
         double radius=1, volume=1;// initial volume of the hypercube (length of the side)
 
         for (int i=0; i<dim; i++) {// volume of the hypercube
                 volume*=2*radius;
         }
-        std::cout << "volume is " << volume << std::endl;
+        //std::cout << "volume is " << volume << std::endl;
         auto start = std::chrono::high_resolution_clock::now(); // start the timer
 
         std::random_device rd;// obtain a random number from hardware
@@ -40,14 +40,14 @@ int MC_integration(int dim) {
                         points_inside++;
                 }
         }
-        std::cout << "points_inside is " << points_inside << std::endl;
+        //std::cout << "points_inside is " << points_inside << std::endl;
 
 
         double ratio= static_cast<double>(points_inside)/n;// ratio between the points inside the semicircle and the total number of points
         double integral=ratio*volume;// approximate value of the integral
         
         std::cout << "--------------------------------------------------------" << std::endl;
-        std::cout << "The approximate result of your integral is: " << integral << std::endl;
+        std::cout << "The approximate result in " << dim << " dimensions of your integral is: " << integral << std::endl;
 
         auto end = std::chrono::high_resolution_clock::now(); // stop the timer
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start); // calculate the duration

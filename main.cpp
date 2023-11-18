@@ -6,12 +6,11 @@
 
 int main() {
 
-    int dim;
+    std::vector<int> dim(6);
+    dim = {1,2,3,4,5,6};
+    for (int i=0; i<6; i++) {
+        MC_integration(dim[i]);
 
-    std::cout << "In how many dimensions your domain of integration is?" << std::endl;
-    std::cin >> dim;
-
-    MC_integration(dim);
-
+    }
     return 0;
 }
