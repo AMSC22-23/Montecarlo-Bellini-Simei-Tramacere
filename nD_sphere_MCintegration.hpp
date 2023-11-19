@@ -3,7 +3,7 @@
 #include <cmath>
 #include <chrono>
 
-int MC_integration(int dim)
+int nD_sphere_MC_integration(int dim)
 {
 
         int n = 1000000;               // number of points
@@ -34,9 +34,9 @@ int MC_integration(int dim)
                         x[j] = distribution(eng); // generate the random numbers
                 }
 
-                sum = 0;
+                sum = 0; // reset the sum
                 for (int j = 0; j < dim; j++)
-                {
+                { // calculate the sum of the squares of the random numbers
                         sum += pow(x[j], 2);
                 }
 
