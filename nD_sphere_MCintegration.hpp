@@ -4,7 +4,7 @@
 #include <chrono>
 
 
-auto nD_sphere_MC_integration(int dim)
+std::pair<double,double> nD_sphere_MC_integration(int dim)
 {
 
         int n = 1000000;               // number of points

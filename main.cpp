@@ -1,9 +1,9 @@
 #include <iostream>
 #include <string>
+#include <cmath>
 
 #include "nD_sphere_MCintegration.hpp"
 #include "sphere_volume.hpp"
-
 
 int main()
 {
@@ -20,7 +20,8 @@ int main()
         std::cout << "The time needed to calculate the integral is: " << result.second << " microseconds" << std::endl;
         volume = sphere_volume(dim[i], 1.0);
         std::cout << "The exact result in " << dim[i] << " dimensions of your integral is: " << volume << std::endl;
-        std::cout << "The relative error is: " << abs(result.first - volume) / volume << std::endl << std::endl;
+        std::cout << "The absolute error is: " << std::abs(result.first - volume) << std::endl;
+        std::cout << "The relative error is: " << std::abs(result.first - volume) / volume << std::endl << std::endl;
     }
 
     return 0;
