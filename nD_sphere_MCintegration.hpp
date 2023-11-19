@@ -3,11 +3,12 @@
 #include <cmath>
 #include <chrono>
 
-int nD_sphere_MC_integration(int dim)
+
+auto nD_sphere_MC_integration(int dim)
 {
 
         int n = 1000000;               // number of points
-        double radius = 1, volume = 1; // initial volume of the hypercube (length of the side)
+        double radius = 1.0, volume = 1.0; // initial volume of the hypercube (length of the side)
 
         for (int i = 0; i < dim; i++)
         { // volume of the hypercube
@@ -50,12 +51,10 @@ int nD_sphere_MC_integration(int dim)
         double ratio = static_cast<double>(points_inside) / n; // ratio between the points inside the semicircle and the total number of points
         double integral = ratio * volume;                      // approximate value of the integral
 
-        std::cout << "--------------------------------------------------------" << std::endl;
-        std::cout << "The approximate result in " << dim << " dimensions of your integral is: " << integral << std::endl;
-
         auto end = std::chrono::high_resolution_clock::now();                                 // stop the timer
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);   // calculate the duration
-        std::cout << "Processing time: " << duration.count() << " microseconds" << std::endl; // print the duration
 
-        return 0;
+        auto result = std::make_pair(integral, duration.count()); // return the integral and the duration
+
+        return result;
 }
