@@ -7,11 +7,13 @@
 std::pair<double,double> nD_sphere_MC_integration(int dim)
 {
 
-        int n=10000;                 // number of points
-        double radius=1., volume=1.; // initial volume of the hypercube (length of the side)
+        int n = 1000000;               // number of points
+        double radius = 1.0, volume = 1.0; // initial volume of the hypercube (length of the side)
 
-        for( int i = 0; i < dim; ++i ) volume *= 2. * radius;
-
+        for (int i = 0; i < dim; i++)
+        { // volume of the hypercube
+                volume *= 2 * radius;
+        }
         // std::cout << "volume is " << volume << std::endl;
         auto start = std::chrono::high_resolution_clock::now(); // start the timer
 
@@ -23,17 +25,26 @@ std::pair<double,double> nD_sphere_MC_integration(int dim)
 
         int points_inside = 0; // number of points inside the semicircle
 
-        std::vector<double> x;       // vector of random numbers
-        x.reserve(static_cast<std::size_t>(dim)); // reserve the memory for the vector
-        double sum = 0.;             // sum of the random numbers
-        for( int i = 0; i < n; ++i )
+        std::vector<double> x(dim); // vector of random numbers
+        double sum = 0;             // sum of the random numbers
+        for (int i = 0; i < n; i++)
         {
-                for( int j = 0; j < dim; ++j ) x.emplace_back(distribution(eng));
+
+                for (int j = 0; j < dim; j++)
+                {                                 // fill the vector
+                        x[j] = distribution(eng); // generate the random numbers
+                }
 
                 sum = 0; // reset the sum
-                for( int j = 0; j < x.size(); ++j ) sum += pow(x[j], 2);
+                for (int j = 0; j < dim; j++)
+                { // calculate the sum of the squares of the random numbers
+                        sum += pow(x[j], 2);
+                }
 
-                if( sum <= pow(radius, 2) ) ++points_inside;
+                if (sum <= pow(radius, 2))
+                { // check if the point is inside the semicircle
+                        points_inside++;
+                }
         }
         // std::cout << "points_inside is " << points_inside << std::endl;
 
@@ -46,5 +57,4 @@ std::pair<double,double> nD_sphere_MC_integration(int dim)
         auto result = std::make_pair(integral, duration.count()); // return the integral and the duration
 
         return result;
-
 }
