@@ -14,23 +14,14 @@ int MC_integration(int n, double domain_bound, int dim) {
 
         std::default_random_engine eng( rd() );
         for( int i = 0; i < n; ++i ) {
+
                 std::uniform_real_distribution<double> distribution(-domain_bound,domain_bound);
-                for( int j = 0; j < dim; ++j ) { //random assignment of the sample points
-                        x[j] = distribution(eng);
-                }
 
+                for( int j = 0; j < dim; ++j ) x.emplace_back(distribution(eng));
 
-                for( int j=0; j < dim; ++j ) {          // check if the point is inside the (hyper)sphere
-                        domain_check += pow(x[j],2);
-                        //std::cout << "domain_check:" << domain_check << std::endl;
-                }
+                for( auto & j : x ) domain_check += pow(j,2);
 
-                for( int j=0; j < dim; ++j ) {  
-                                //sum += class.my_function( pow(x[j],2) );// TODO generalizzare la funzione
-                                sum +=  pow(x[j],2);
-                                
-                        }
-
+                for( auto & j : x ) sum += pow(j,2);
 
                 //CALCOLA VOLUME SFERA
                 /*if ( domain_check <= pow(domain_bound,2) ) {  // if the point is inside the (hyper)sphere
@@ -41,10 +32,8 @@ int MC_integration(int n, double domain_bound, int dim) {
                 domain_check = 0;
         }
 
-        double domain_size = 1.0;
-        for( int j=0; j < dim; ++j ) {  
-                domain_size *= 2.0*domain_bound; // calculate the (hyper)volume
-        }
+        double domain_size = 1.;
+        for( int j = 0; j < dim; ++j ) domain_size *= 2. *domain_bound; // calculate the (hyper)volume
 
         integral = domain_size*sum/(double)n; //TODO generalizzare il dominio per ogni dimensione
         std::cout << "--------------------------------------------------------" << std::endl;
