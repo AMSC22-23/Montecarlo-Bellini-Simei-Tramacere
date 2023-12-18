@@ -16,6 +16,11 @@ class HyperSphere: public Geometry
             points_inside = 0;
         }
 
+        //@note: this function is very confusing:
+        //       you take as input a vector by reference, so that you can modify it
+        //       and the you return it by copy
+        //       To me, this means that you have not understood well references and return values
+        //       since you are making a copy of something that is already in the state you want
         std::vector<double> generate_random_point(std::vector<double>& random_point) override {
             std::uniform_real_distribution<double> distribution(-radius, radius);
             // create a vector to store the random point
@@ -26,6 +31,7 @@ class HyperSphere: public Geometry
                 random_point.push_back(distribution(eng));
             }
             // check if the point is inside the hypersphere
+            //@note: here a for loop would have been more effective
             double sum_of_squares = std::accumulate(random_point.begin(), random_point.end(), 
                     0.0, [](double sum, double x) { return sum + std::pow(x, 2); });
             if (sum_of_squares <= std::pow(radius, 2)) return random_point;
@@ -33,6 +39,8 @@ class HyperSphere: public Geometry
         }
 
         void calculate_volume() override {
+            //@note: should use std:: for math functions
+            //@note: the number header for \pi instead of M_PI
             volume = pow(M_PI, parameter) / tgamma(parameter + 1.0) * pow(radius, dimension);
         }
 
