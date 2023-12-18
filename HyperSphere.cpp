@@ -8,7 +8,7 @@
 class HyperSphere: public Geometry
 {
     public:
-        HyperSphere(int dim, double rad) {
+        HyperSphere(int dim, double rad) :eng(rd()) {
             dimension = dim;
             radius = rad;
             parameter = dim / 2.0;
@@ -16,14 +16,11 @@ class HyperSphere: public Geometry
             points_inside = 0;
         }
 
-        std::vector<double> generate_random_point() override {
-            // setup the random number generator
-            std::random_device rd;
-            std::default_random_engine eng(rd());
+        std::vector<double> generate_random_point(std::vector<double>& random_point) override {
             std::uniform_real_distribution<double> distribution(-radius, radius);
             // create a vector to store the random point
-            std::vector<double> random_point;
-            random_point.reserve(dimension);
+            /*std::vector<double> random_point;
+            random_point.reserve(dimension);*/
             // generate the random point     
             for (int i = 0; i < dimension; ++i) {                                
                 random_point.push_back(distribution(eng));
@@ -45,9 +42,15 @@ class HyperSphere: public Geometry
 
         void add_point_inside() { ++points_inside; }
 
+        int get_points_inside() const { return points_inside; }
+
+        int get_dimension() const { return dimension; }
+
     protected:
         double radius;
         double parameter;
         double hypercube_volume;
         int points_inside;
+        std::random_device rd;
+        std::default_random_engine eng;
 };

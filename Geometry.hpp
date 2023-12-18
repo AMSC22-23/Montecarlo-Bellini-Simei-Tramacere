@@ -7,7 +7,7 @@ class Geometry
     public:
         Geometry() = default;
         
-        virtual std::vector<double> generate_random_point() = 0;
+        virtual std::vector<double> generate_random_point(std::vector<double>& random_point) = 0;
         virtual void calculate_volume() = 0;
         virtual void calculate_approximated_volume(int) = 0;
 
