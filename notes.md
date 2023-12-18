@@ -15,6 +15,7 @@
 - The semantics of the function `generate_random_point` is a bit unclear
 - The `Montecarlo_integration` should work for different geometries (at least hyper-rectangles and hyper-balls)
 - There is not much code
+- Power with integer exponent should not use `std::pow`
 
 ## Minor
 - the number header for \pi instead of M_PI

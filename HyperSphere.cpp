@@ -32,6 +32,7 @@ class HyperSphere: public Geometry
             }
             // check if the point is inside the hypersphere
             //@note: here a for loop would have been more effective
+            //@note: power with integer exponent should not use `std::pow`
             double sum_of_squares = std::accumulate(random_point.begin(), random_point.end(), 
                     0.0, [](double sum, double x) { return sum + std::pow(x, 2); });
             if (sum_of_squares <= std::pow(radius, 2)) return random_point;
