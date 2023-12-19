@@ -12,8 +12,6 @@
 #include "muParserError.cpp"
 #include "muParserTokenReader.cpp"
 #include "HyperSphere.cpp"
-// note that the following method implements rn only the special case with the function f(x) = 1
-// TODO: generalize the method for all the functions
 
 double evaluateFunction(const std::string &expression, const std::vector<double> &point, mu::Parser &parser)
 {
@@ -42,28 +40,26 @@ double evaluateFunction(const std::string &expression, const std::vector<double>
 
 std::pair<double, double> Montecarlo_integration(HyperSphere &hypersphere, int n, const std::string &function, int dimension)
 {
-
-    static mu::Parser parser; // Declare the parser as static to reuse it for each point
     double total_value = 0.0;
     double result = 0.0;
-    // start the timer
     auto start = std::chrono::high_resolution_clock::now();
 
-    std::vector<double> random_point_vector;
-    random_point_vector.reserve(dimension);
+    std::vector<double> random_point_vector(dimension);
 
-// generate the random points
-#pragma omp parallel for
-    for (int i = 0; i < n; ++i)
+#pragma omp parallel private(result)
     {
-        random_point_vector.clear();
-        hypersphere.generate_random_point(random_point_vector);
-        if (!random_point_vector.empty())
+        mu::Parser parser;
+#pragma omp for reduction(+ : total_value)
+        for (int i = 0; i < n; ++i)
         {
-            result = evaluateFunction(function, random_point_vector, parser);
-            parser.ClearVar();
-            total_value += result;
-            hypersphere.add_point_inside();
+            hypersphere.generate_random_point(random_point_vector);
+            if (!random_point_vector.empty())
+            {
+                result = evaluateFunction(function, random_point_vector, parser);
+                parser.ClearVar();
+                total_value += result;
+                hypersphere.add_point_inside();
+            }
         }
     }
 
@@ -83,13 +79,38 @@ int main(int argc, char **argv)
     int n, dim;
     double rad;
     std::string function;
-    // ask the user to insert the parameters
+    // Get and validate number of random points
     std::cout << "Insert the number of random points to generate: ";
     std::cin >> n;
+    while (std::cin.fail() || n <= 0)
+    {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cout << "Invalid input. Please enter a positive integer: ";
+        std::cin >> n;
+    }
+
+    // Get and validate dimension of hypersphere
     std::cout << "Insert the dimension of the hypersphere: ";
     std::cin >> dim;
+    while (std::cin.fail() || dim <= 0)
+    {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cout << "Invalid input. Please enter a positive integer: ";
+        std::cin >> dim;
+    }
+
+    // Get and validate radius of hypersphere
     std::cout << "Insert the radius of the hypersphere: ";
     std::cin >> rad;
+    while (std::cin.fail() || rad <= 0)
+    {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cout << "Invalid input. Please enter a positive number: ";
+        std::cin >> rad;
+    }
     // ask the user to insert the function to integrate
     std::cout << "Insert the function to integrate: ";
     std::cin >> function;
@@ -100,10 +121,14 @@ int main(int argc, char **argv)
     std::cout << std::endl
               << "The approximate result in " << dim << " dimensions of your integral is: " << result.first << std::endl;
     std::cout << "The time needed to calculate the integral is: " << result.second << " microseconds" << std::endl;
-    // hypersphere.calculate_volume();
-    // double exact_domain = hypersphere.get_volume();
-    // std::cout << "The exact domain in " << dim << " dimensions of your integral is: " << exact_domain << std::endl;
-    // std::cout << "The absolute error is: " << std::abs(result.first - volume) << std::endl;
-    // std::cout << "The relative error is: " << std::abs(result.first - volume) / volume << std::endl;
+    // calculate the exact domain if the user tries to integrate the volume of the hypersphere
+    if (function == "1")
+    {
+        hypersphere.calculate_volume();
+        double exact_domain = hypersphere.get_volume();
+        std::cout << "The exact domain in " << dim << " dimensions you were looking for is: " << exact_domain << std::endl;
+        std::cout << "The absolute error is: " << std::abs(result.first - exact_domain) << std::endl;
+        std::cout << "The relative error is: " << std::abs(result.first - exact_domain) / exact_domain << std::endl;
+    }
     return 0;
 }

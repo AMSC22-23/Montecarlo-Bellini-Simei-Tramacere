@@ -2,59 +2,65 @@
 #include <vector>
 #include <cmath>
 #include <omp.h>
+
+constexpr double PI = 3.14159265358979323846;
+
 #include "HyperSphere.hpp"
 
+HyperSphere::HyperSphere(int dim, double rad) : eng(rd())
+{
+    dimension = dim;
+    radius = rad;
+    parameter = dim / 2.0;
+    hypercube_volume = pow(2 * radius, dimension);
+    points_inside = 0;
+}
 
-    HyperSphere::HyperSphere(int dim, double rad) : eng(rd())
-    {
-        dimension = dim;
-        radius = rad;
-        parameter = dim / 2.0;
-        hypercube_volume = pow(2 * radius, dimension);
-        points_inside = 0;
-    }
+void HyperSphere::generate_random_point(std::vector<double> &random_point)
+{
+    random_point.resize(dimension);
 
-        //@note: this function is very confusing:
-        //       you take as input a vector by reference, so that you can modify it
-        //       and the you return it by copy
-        //       To me, this means that you have not understood well references and return values
-        //       since you are making a copy of something that is already in the state you want
-    void HyperSphere::generate_random_point(std::vector<double> &random_point)
+#pragma omp parallel
     {
+        std::default_random_engine local_eng(rd());
         std::uniform_real_distribution<double> distribution(-radius, radius);
-        random_point.reserve(dimension);
 
-#pragma omp parallel for
+#pragma omp for
         for (int i = 0; i < dimension; ++i)
         {
-            random_point.push_back(distribution(eng));
+            random_point[i] = distribution(local_eng);
         }
-        
-        // check if the point is inside the hypersphere
-            //@note: here a for loop would have been more effective
-            //@note: power with integer exponent should not use `std::pow`
-        double sum_of_squares = std::accumulate(random_point.begin(), random_point.end(),
-                                                0.0, [](double sum, double x)
-                                                { return sum + std::pow(x, 2); });
-        if (sum_of_squares > std::pow(radius, 2))
-            random_point.clear();
     }
 
-    void HyperSphere::calculate_volume()
+    // check if the point is inside the hypersphere
+    double sum_of_squares = 0.0;
+    double x = 0.0;
+    int size = random_point.size();
+#pragma omp parallel for reduction(+ : sum_of_squares)
+    for (int i = 0; i < size; ++i)
     {
-            //@note: should use std:: for math functions
-            //@note: the number header for \pi instead of M_PI
-        volume = pow(M_PI, parameter) / tgamma(parameter + 1.0) * pow(radius, dimension);
+        x = random_point[i];
+        sum_of_squares += x * x;
     }
 
-    void HyperSphere::calculate_approximated_volume(int n)
+    if (sum_of_squares > radius * radius)
     {
-        approximated_volume = (static_cast<double>(points_inside) / n) * hypercube_volume;
+        random_point.clear();
     }
+}
 
-    void HyperSphere::add_point_inside() { ++points_inside; }
+void HyperSphere::calculate_volume()
+{
+    volume = std::pow(PI, parameter) / std::tgamma(parameter + 1.0) * std::pow(radius, dimension);
+}
 
-    int HyperSphere::get_points_inside() const { return points_inside; }
+void HyperSphere::calculate_approximated_volume(int n)
+{
+    approximated_volume = (static_cast<double>(points_inside) / n) * hypercube_volume;
+}
 
-    int HyperSphere::get_dimension() const { return dimension; }
+void HyperSphere::add_point_inside() { ++points_inside; }
 
+int HyperSphere::get_points_inside() const { return points_inside; }
+
+int HyperSphere::get_dimension() const { return dimension; }
