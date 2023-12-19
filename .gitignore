@@ -1,0 +1,8 @@
+# Ignore compiled binaries
+*.exe
+
+# Ignore IDE and editor specific files
+.vscode/
+
+# Ignore OS generated files
+.DS_Store
