@@ -1,4 +1,4 @@
-#include "mc_integrator.hpp"
+#include "MonteCarlo.hpp"
 
 #include <chrono>
 

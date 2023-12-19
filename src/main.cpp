@@ -4,16 +4,16 @@
 #include <chrono>
 #include <omp.h>
 
-#include "muParser.h"
-#include "muParser.cpp"
-#include "muParserBase.cpp"
-#include "muParserBytecode.cpp"
-#include "muParserCallback.cpp"
-#include "muParserError.cpp"
-#include "muParserTokenReader.cpp"
+#include "muparser-2.3.4/include/muParser.h"
+#include "muparser-2.3.4/src/muParser.cpp"
+#include "muparser-2.3.4/src/muParserBase.cpp"
+#include "muparser-2.3.4/src/muParserBytecode.cpp"
+#include "muparser-2.3.4/src/muParserCallback.cpp"
+#include "muparser-2.3.4/src/muParserError.cpp"
+#include "muparser-2.3.4/src/muParserTokenReader.cpp"
 
 #include "input_manager.hpp"
-#include "mc_integrator.hpp"
+#include "MonteCarlo.hpp"
 
 // to compile: g++ -std=c++17 main.cpp HyperSphere.cpp input_manager.cpp mc_integrator.cpp -I{your path to muparser folder}/muparser-2.3.4/include -o main
 

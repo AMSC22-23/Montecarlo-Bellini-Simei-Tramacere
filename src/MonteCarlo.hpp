@@ -1,7 +1,7 @@
 #include <string>
 #include <vector>
 
-#include "muParser.h"
+#include "muparser-2.3.4/include/muParser.h"
 
 #include "Geometry.hpp"
 #include "HyperSphere.hpp"
