@@ -14,11 +14,6 @@
         points_inside = 0;
     }
 
-        //@note: this function is very confusing:
-        //       you take as input a vector by reference, so that you can modify it
-        //       and the you return it by copy
-        //       To me, this means that you have not understood well references and return values
-        //       since you are making a copy of something that is already in the state you want
     void HyperSphere::generate_random_point(std::vector<double> &random_point)
     {
         std::uniform_real_distribution<double> distribution(-radius, radius);
