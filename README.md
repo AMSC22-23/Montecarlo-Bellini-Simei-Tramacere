@@ -1,5 +1,7 @@
 <p align="center">
 # MonteCarlo Integration
+</p>
+<p align="center">
 ## Emanuele Bellini, Luca Simei, LucaTramacere
 </p>
 
