@@ -11,3 +11,21 @@ rm ./runner
 ln -s build/bin/runner runner
 ./runner
 ```
+
+### What to expect
+The user can choose the integration domain from the following options:
+- [x] (hs) HyperSphere
+- [ ] (hr) HyperRectangle
+- [ ] (hb) HyperBall
+
+He can then choose:
+
+- The number of random points to generate
+- The dimension in which the integration domain is located
+- Some parameters related to the integration domain
+- The function to be integrated
+
+The program will provide the approximate value of the integral and the time required for the calculation.
+
+### Notes
+The higher the number of random points the user chooses to generate, the slower the program will be, but the result will be more accurate. The code is parallelized using OpenMP. The user can freely select the function they want to integrate, thanks to the [muParserX](https://github.com/beltoforion/muparserx) library.
