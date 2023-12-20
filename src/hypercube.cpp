@@ -1,38 +1,37 @@
 #include <omp.h>
 #include <iostream>
-#include "project/hyperrectangle.hpp"
+#include "project/hypercube.hpp"
 
 constexpr double PI = 3.14159265358979323846;
 
-HyperRectangle::HyperRectangle(int dim, std::vector<double> &hyper_rectangle_bounds) : eng(rd())
+HyperCube::HyperCube(int dim, double &edge) : eng(rd())
 {
     dimension = dim;
-    this->hyper_rectangle_bounds = hyper_rectangle_bounds;
+    this->edge = edge;
     volume = 1.0;
 }
 
-void HyperRectangle::generate_random_point(std::vector<double> &random_point)
+void HyperCube::generate_random_point(std::vector<double> &random_point)
 {
-    int j = 0;
+    std::uniform_real_distribution<double> distribution(-edge/2, edge/2);
+    random_point.reserve(dimension);
+
 #pragma omp parallel for
-    for (int i = 0; i < dimension * 2 - 1; i += 2)
-    {
-        std::uniform_real_distribution<double> distribution(hyper_rectangle_bounds[i], hyper_rectangle_bounds[i + 1]);
-        random_point[j] = distribution(eng);
-        j++;
+    for (int i = 0; i < dimension; ++i)
+        random_point.push_back(distribution(eng));
+
+}
+
+void HyperCube::calculate_volume()
+{
+    this->volume = 1.0;
+#pragma omp parallel for
+    for (int i = 0; i < dimension; ++i){
+        this->volume *= this->edge;
     }
 }
 
-void HyperRectangle::calculate_volume()
-{
-#pragma omp parallel for
-    for (int i = 0; i < 2 * dimension - 1; i += 2)
-    {
-        volume *= (hyper_rectangle_bounds[i + 1] - hyper_rectangle_bounds[i]);
-    }
-}
-
-std::pair<double, double> HyperRectangle::Montecarlo_integration(int n, const std::string &function, int dimension)
+std::pair<double, double> HyperCube::Montecarlo_integration(int n, const std::string &function)
 {
     double total_value = 0.0;
     double result = 0.0;

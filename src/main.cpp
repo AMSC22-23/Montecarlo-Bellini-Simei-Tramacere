@@ -15,26 +15,33 @@
 #include "project/inputmanager.hpp"
 #include "project/hypersphere.hpp"
 #include "project/hyperrectangle.hpp"
+#include "project/hypercube.hpp"
+
+
 
 // to compile: g++ -std=c++17 main.cpp HyperSphere.cpp input_manager.cpp mc_integrator.cpp -I{your path to muparser folder}/muparser-2.3.4/include -o main
 
 int main(int argc, char **argv)
 {
     int n, dim;
-    double rad;
+    double rad, edge;
     std::string function;
     std::string domain_type;
     std::vector<double> hyper_rectangle_bounds;
     std::pair<double, double> result;
 
     // get the input from the user
-    input_manager(n, dim, rad, function, domain_type, hyper_rectangle_bounds);
+    input_manager(n, dim, rad, edge, function, domain_type, hyper_rectangle_bounds);
 
-    // TODO: if (domain_type == "hc")
     if (domain_type == "hs")
     {
         HyperSphere hypersphere(dim, rad);
         result = hypersphere.Montecarlo_integration(n, function, dim);
+    }
+    else if (domain_type == "hc")
+    {
+        HyperCube hypercube(dim, edge);
+        result = hypercube.Montecarlo_integration(n, function);
     }
     else if (domain_type == "hr")
     {

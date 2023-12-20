@@ -72,5 +72,3 @@ std::pair<double, double> HyperSphere::Montecarlo_integration(int n, const std::
 void HyperSphere::add_point_inside() { ++points_inside; }
 
 int HyperSphere::get_points_inside() const { return points_inside; }
-
-int HyperSphere::get_dimension() const { return dimension; }

@@ -3,7 +3,7 @@
 #include <chrono>
 #include <vector>
 
-void input_manager(int &n, int &dim, double &rad, std::string &function, std::string &domain_type, std::vector<double> &hyper_rectangle_bounds)
+void input_manager(int &n, int &dim, double &rad, double &edge, std::string &function, std::string &domain_type, std::vector<double> &hyper_rectangle_bounds)
 {
     // Get and validate number of random points
     std::cout << "Insert the type of domain you want to integrate: (hc for hyper-cube, hs for hyper-sphere, hr for hyper-rectangle)" << std::endl;
@@ -97,8 +97,8 @@ void input_manager(int &n, int &dim, double &rad, std::string &function, std::st
             std::cin >> dim;
         }
         std::cout << "Insert the upper bound of the hypercube: ";
-        std::cin >> rad;
-        while (std::cin.fail() || rad <= 0)
+        std::cin >> edge;
+        while (std::cin.fail() || edge <= 0)
         {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');

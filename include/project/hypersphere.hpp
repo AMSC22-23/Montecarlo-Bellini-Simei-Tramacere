@@ -25,8 +25,6 @@ public:
 
     int get_points_inside() const;
 
-    int get_dimension() const;
-
 protected:
     double radius;
     double parameter;
