@@ -13,8 +13,8 @@ OBJECTS = $(SOURCES:$(SRC_PATH)/%.$(SRC_EXT)=$(BUILD_PATH)/%.o)
 DEPS = $(OBJECTS:.o=.d)
 
 COMPILE_FLAGS = -std=c++17 -Wall -Wextra -g
-INCLUDES = -I include/ -I /usr/local/include -I include/muparser-2.3.4/include -I include/muparser-2.3.4/src
-LIBS =	
+INCLUDES = -I include/ -I /usr/local/include -I include/muparser-2.3.4/include -I include/muparser-2.3.4/src -I /usr/local/opt/libomp/include/omp.h -I /usr/lib/gcc/x86_64-linux-gnu/11/include/omp.h
+LIBS = 
 
 .PHONY: default_target
 default_target: release

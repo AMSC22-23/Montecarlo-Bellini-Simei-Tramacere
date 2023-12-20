@@ -3,7 +3,6 @@
 #include <string>
 #include <chrono>
 
-#include "/usr/local/opt/libomp/include/omp.h"
 
 #include "muParser.h"
 #include "muParser.cpp"

@@ -3,7 +3,6 @@
 #include <cmath>
 
 
-#include "/usr/local/opt/libomp/include/omp.h"
 #include "project/hypersphere.hpp"
 
 
