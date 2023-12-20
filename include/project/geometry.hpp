@@ -1,11 +1,12 @@
-#ifndef GEOMETRY_HPP
-#define GEOMETRY_HPP
+#ifndef PROJECT_GEOMETRY_
+    #define PROJECT_GEOMETRY_
 
 #include <vector>
 #include <string>
 
-class Geometry
-{
+
+class Geometry {
+    
     public:
         Geometry() = default;
         
@@ -20,7 +21,6 @@ class Geometry
         inline double get_approximated_volume() const { return approximated_volume; }
         inline std::string get_function() const { return function; }
 
-
     protected:
         int dimension;
         double volume;
@@ -28,4 +28,5 @@ class Geometry
         std::string function;
 };
 
-#endif // GEOMETRY_HPP
+
+#endif
