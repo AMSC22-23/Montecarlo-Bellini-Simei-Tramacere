@@ -6,5 +6,8 @@ This is the project for the Advanced Methods for Scientific Computing course @ P
 ### To compile
 
 ```bash
-g++ -std=c++17 main.cpp HyperSphere.cpp input_manager.cpp mc_integrator.cpp -I{your path to muparser folder}/muparser-2.3.4/include -o main
+make
+rm ./runner
+ln -s build/bin/runner runner
+./runner
 ```
