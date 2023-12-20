@@ -47,10 +47,6 @@ std::pair<double, double> HyperSphere::Montecarlo_integration(int n, const std::
         for (int i = 0; i < n; ++i)
         {
             this->generate_random_point(random_point_vector);
-            for (int i = 0; i < dimension; i++)
-            {
-                std::cout << "random point: " << random_point_vector[i] << std::endl;
-            }
             if (!random_point_vector.empty())
             {
                 result = evaluateFunction(function, random_point_vector, parser);
