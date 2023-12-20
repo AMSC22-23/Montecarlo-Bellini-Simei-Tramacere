@@ -1,5 +1,5 @@
 #ifndef PROJECT_FUNCTIONEVALUATOR_
-#define PROJECT_FUNCTION_EVALUATOR_
+    #define PROJECT_FUNCTIONEVALUATOR_
 
 #include <string>
 #include <vector>
