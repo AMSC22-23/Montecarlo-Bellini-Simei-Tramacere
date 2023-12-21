@@ -29,3 +29,8 @@ The program will provide the approximate value of the integral and the time requ
 
 ### Notes
 The higher the number of random points the user chooses to generate, the slower the program will be, but the result will be more accurate. The code is parallelized using OpenMP. The user can freely select the function they want to integrate, thanks to the [muParserX](https://github.com/beltoforion/muparserx) library.
+
+### Next steps
+- Enhance domain flexibility, like domain location and other types of domains
+- Implement feature for managing complex numbers
+- Application in a real world case
