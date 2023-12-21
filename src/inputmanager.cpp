@@ -96,7 +96,7 @@ void input_manager(int &n, int &dim, double &rad, double &edge, std::string &fun
             std::cout << "Invalid input. Please enter a positive integer: ";
             std::cin >> dim;
         }
-        std::cout << "Insert the upper bound of the hypercube: ";
+        std::cout << "Insert the edge length of the hypercube: ";
         std::cin >> edge;
         while (std::cin.fail() || edge <= 0)
         {

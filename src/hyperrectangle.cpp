@@ -37,7 +37,7 @@ std::pair<double, double> HyperRectangle::Montecarlo_integration(int n, const st
     double total_value = 0.0;
     double result = 0.0;
     auto start = std::chrono::high_resolution_clock::now();
-    std::vector<double> random_point_vector(n);
+    std::vector<double> random_point_vector(this->dimension);
 
 #pragma omp parallel private(result)
     {
