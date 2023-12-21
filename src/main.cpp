@@ -17,8 +17,6 @@
 #include "project/hyperrectangle.hpp"
 #include "project/hypercube.hpp"
 
-
-
 // to compile: g++ -std=c++17 main.cpp HyperSphere.cpp input_manager.cpp mc_integrator.cpp -I{your path to muparser folder}/muparser-2.3.4/include -o main
 
 int main(int argc, char **argv)
@@ -28,7 +26,7 @@ int main(int argc, char **argv)
     std::string function;
     std::string domain_type;
     std::vector<double> hyper_rectangle_bounds;
-    std::pair<double, double> result;
+    std::pair<double, double> result = {0.0, 0.0};
 
     // get the input from the user
     input_manager(n, dim, rad, edge, function, domain_type, hyper_rectangle_bounds);
@@ -36,17 +34,41 @@ int main(int argc, char **argv)
     if (domain_type == "hs")
     {
         HyperSphere hypersphere(dim, rad);
-        result = hypersphere.Montecarlo_integration(n, function, dim);
+        if (function == "1")
+        {
+            hypersphere.calculate_volume();
+            result.first = hypersphere.get_volume();
+        }
+        else
+        {
+            result = hypersphere.Montecarlo_integration(n, function, dim);
+        }
     }
     else if (domain_type == "hc")
     {
         HyperCube hypercube(dim, edge);
-        result = hypercube.Montecarlo_integration(n, function);
+        if (function == "1")
+        {
+            hypercube.calculate_volume();
+            result.first = hypercube.get_volume();
+        }
+        else
+        {
+            result = hypercube.Montecarlo_integration(n, function);
+        }
     }
     else if (domain_type == "hr")
     {
         HyperRectangle hyperrectangle(dim, hyper_rectangle_bounds);
-        result = hyperrectangle.Montecarlo_integration(n, function, dim);
+        if (function == "1")
+        {
+            hyperrectangle.calculate_volume();
+            result.first = hyperrectangle.get_volume();
+        }
+        else
+        {
+            result = hyperrectangle.Montecarlo_integration(n, function, dim);
+        }
     }
     else
     {
@@ -54,7 +76,8 @@ int main(int argc, char **argv)
     }
     std::cout << std::endl
               << "The approximate result in " << dim << " dimensions of your integral is: " << result.first << std::endl;
-    std::cout << "The time needed to calculate the integral is: " << result.second << " microseconds" << std::endl;
+    if (result.second != 0.0) 
+        std::cout << "The time needed to calculate the integral is: " << result.second << " microseconds" << std::endl;
 
     // calculate the exact domain if the user tries to integrate the volume of the hypersphere
     // TODO with various domains

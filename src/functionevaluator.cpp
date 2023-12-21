@@ -3,7 +3,6 @@
 
 double evaluateFunction(const std::string &expression, const std::vector<double> &point, mu::Parser &parser)
 {
-#pragma omp parallel for
     for (size_t i = 0; i < point.size(); ++i)
     {
         std::string varName = "x" + std::to_string(i + 1);
