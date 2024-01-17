@@ -17,7 +17,6 @@
 #include "project/hyperrectangle.hpp"
 #include "project/hypercube.hpp"
 
-// to compile: g++ -std=c++17 main.cpp HyperSphere.cpp input_manager.cpp mc_integrator.cpp -I{your path to muparser folder}/muparser-2.3.4/include -o main
 
 int main(int argc, char **argv)
 {
@@ -79,15 +78,6 @@ int main(int argc, char **argv)
     if (result.second != 0.0) 
         std::cout << "The time needed to calculate the integral is: " << result.second << " microseconds" << std::endl;
 
-    // calculate the exact domain if the user tries to integrate the volume of the hypersphere
-    // TODO with various domains
-    /*if (function == "1")
-    {
-        integration_domain.calculate_volume();
-        double exact_domain = hypersphere.get_volume();
-        std::cout << "The exact domain in " << dim << " dimensions you were looking for is: " << exact_domain << std::endl;
-        std::cout << "The absolute error is: " << std::abs(result.first - exact_domain) << std::endl;
-        std::cout << "The relative error is: " << std::abs(result.first - exact_domain) / exact_domain << std::endl;
-    }*/
+    
     return 0;
 }
