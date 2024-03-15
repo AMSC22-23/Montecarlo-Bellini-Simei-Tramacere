@@ -22,7 +22,7 @@ void HyperSphere::generate_random_point(std::vector<double> &random_point)
 
     double sum_of_squares = 0.0;
 #pragma omp parallel for
-    for (int i = 0; i < random_point.size(); ++i)
+    for (std::vector<double>::size_type i = 0; i < random_point.size(); ++i)
         sum_of_squares += random_point[i] * random_point[i];
 
     if (sum_of_squares > radius * radius)
@@ -37,13 +37,14 @@ void HyperSphere::calculate_volume()
 std::pair<double, double> HyperSphere::Montecarlo_integration(int n, const std::string &function, int dimension)
 {
     double total_value = 0.0;
+    double total_squared_value = 0.0;
     double result = 0.0;
     auto start = std::chrono::high_resolution_clock::now();
     std::vector<double> random_point_vector(dimension);
 #pragma omp parallel private(result)
     {
         mu::Parser parser;
-#pragma omp for reduction(+ : total_value)
+#pragma omp for reduction(+ : total_value, total_squared_value)
         for (int i = 0; i < n; ++i)
         {
             this->generate_random_point(random_point_vector);
@@ -52,6 +53,7 @@ std::pair<double, double> HyperSphere::Montecarlo_integration(int n, const std::
                 result = evaluateFunction(function, random_point_vector, parser);
                 parser.ClearVar();
                 total_value += result;
+                total_squared_value += result * result;
                 this->add_point_inside();
             }
         }
@@ -63,6 +65,11 @@ std::pair<double, double> HyperSphere::Montecarlo_integration(int n, const std::
     std::cout << "domain: " << domain << std::endl;
     int points_inside = this->get_points_inside();
     double integral = total_value / static_cast<double>(points_inside) * domain;
+
+    // calculate the variance
+    double variance = total_squared_value / static_cast<double>(n) - (total_value / static_cast<double>(n)) * (total_value / static_cast<double>(n));
+    std::cout << "Variance: " << variance << std::endl;
+
     // stop the timer
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
