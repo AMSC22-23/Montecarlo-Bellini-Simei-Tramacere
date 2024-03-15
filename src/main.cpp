@@ -3,6 +3,7 @@
 #include <string>
 #include <chrono>
 #include <omp.h>
+#include <iomanip>
 
 #include "muParser.h"
 #include "muParser.cpp"
@@ -16,19 +17,34 @@
 #include "project/hypersphere.hpp"
 #include "project/hyperrectangle.hpp"
 #include "project/hypercube.hpp"
+#include "project/asset.hpp"
 
 
-int main(int argc, char **argv)
+int main()
 {
-    int n, dim;
+    /*int n, dim;
     double rad, edge;
     std::string function;
     std::string domain_type;
     std::vector<double> hyper_rectangle_bounds;
-    std::pair<double, double> result = {0.0, 0.0};
+    std::pair<double, double> result = {0.0, 0.0};*/
+    
+
+    Asset asset{};
+    
+    std::string filename = "NVDA.csv";
+    int csv_result = csv_reader(filename, &asset);
+    if (csv_result == -1) {
+        std::cout << "Error reading the file." << std::endl;
+        return -1;
+    }
+
+    // printing the stored data
+    
+    std::cout << "Mean Return: " << asset.get_mean_return() << std::endl;
 
     // get the input from the user
-    input_manager(n, dim, rad, edge, function, domain_type, hyper_rectangle_bounds);
+    /*input_manager(n, dim, rad, edge, function, domain_type, hyper_rectangle_bounds);
 
     if (domain_type == "hs")
     {
@@ -76,7 +92,7 @@ int main(int argc, char **argv)
     std::cout << std::endl
               << "The approximate result in " << dim << " dimensions of your integral is: " << result.first << std::endl;
     if (result.second != 0.0) 
-        std::cout << "The time needed to calculate the integral is: " << result.second << " microseconds" << std::endl;
+        std::cout << "The time needed to calculate the integral is: " << result.second << " microseconds" << std::endl;*/
 
     
     return 0;
