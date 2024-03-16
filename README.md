@@ -6,10 +6,10 @@ This is the project for the Advanced Methods for Scientific Computing course @ P
 ### To compile
 
 ```bash
+mkdir build
+cd build
+cmake ..
 make
-rm ./runner
-ln -s build/bin/runner runner
-./runner
 ```
 
 ### What to expect
