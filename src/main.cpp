@@ -7,12 +7,7 @@
 //#include <cblas.h>
 
 #include "../include/muparser-2.3.4/include/muParser.h"
-#include "../include/muparser-2.3.4/src/muParser.cpp"
-#include "../include/muparser-2.3.4/src/muParserBase.cpp"
-#include "../include/muparser-2.3.4/src/muParserBytecode.cpp"
-#include "../include/muparser-2.3.4/src/muParserCallback.cpp"
-#include "../include/muparser-2.3.4/src/muParserError.cpp"
-#include "../include/muparser-2.3.4/src/muParserTokenReader.cpp"
+#include "../include/muparser-2.3.4/include/muParserIncluder.h"
 
 #include "../include/project/inputmanager.hpp"
 #include "../include/project/hypersphere.hpp"
