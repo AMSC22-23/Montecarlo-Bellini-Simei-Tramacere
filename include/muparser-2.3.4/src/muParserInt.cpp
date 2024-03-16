@@ -26,7 +26,7 @@
 	OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "muParserInt.h"
+#include "../include/muParserInt.h"
 
 #include <cmath>
 #include <algorithm>

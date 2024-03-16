@@ -26,8 +26,8 @@
 	OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "muParser.h"
-#include "muParserTemplateMagic.h"
+#include "../include/muParser.h"
+#include "../include/muParserTemplateMagic.h"
 
 //--- Standard includes ------------------------------------------------------------------------
 #include <cmath>

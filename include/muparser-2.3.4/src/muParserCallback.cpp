@@ -26,7 +26,7 @@
 	OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "muParserCallback.h"
+#include "../include/muParserCallback.h"
 
 #if defined(_MSC_VER)
 	#pragma warning(push)

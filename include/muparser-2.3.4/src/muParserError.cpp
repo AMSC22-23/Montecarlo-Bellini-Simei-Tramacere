@@ -26,7 +26,7 @@
 	OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "muParserError.h"
+#include "../include/muParserError.h"
 #include <exception>
 
 #if defined(_MSC_VER)

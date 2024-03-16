@@ -26,7 +26,7 @@
 	OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "muParserBytecode.h"
+#include "../include/muParserBytecode.h"
 
 #include <algorithm>
 #include <string>
@@ -34,10 +34,10 @@
 #include <vector>
 #include <iostream>
 
-#include "muParserDef.h"
-#include "muParserError.h"
-#include "muParserToken.h"
-#include "muParserTemplateMagic.h"
+#include "../include/muParserDef.h"
+#include "../include/muParserError.h"
+#include "../include/muParserToken.h"
+#include "../include/muParserTemplateMagic.h"
 
 #if defined(_MSC_VER)
 	#pragma warning(push)
