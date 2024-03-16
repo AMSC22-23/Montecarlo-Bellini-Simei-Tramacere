@@ -3,13 +3,14 @@
 
 This is the project for the Advanced Methods for Scientific Computing course @ Politecnico di Milano. Objective of this project is to compute the approximation of an integral over a domain in n dimensions using a MonteCarlo Algorithm.
 
-### To compile
+### To compile and run
 
 ```bash
 mkdir build
 cd build
 cmake ..
 make
+./mainOmp
 ```
 
 ### What to expect
