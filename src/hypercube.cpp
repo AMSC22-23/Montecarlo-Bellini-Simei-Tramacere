@@ -1,6 +1,6 @@
 #include <omp.h>
 #include <iostream>
-#include "project/hypercube.hpp"
+#include "../include/project/hypercube.hpp"
 
 HyperCube::HyperCube(int dim, double &edge) : eng(rd())
 {

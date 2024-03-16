@@ -1,5 +1,5 @@
 #include <omp.h>
-#include "project/hypersphere.hpp"
+#include "../include/project/hypersphere.hpp"
 
 constexpr double PI = 3.14159265358979323846;
 

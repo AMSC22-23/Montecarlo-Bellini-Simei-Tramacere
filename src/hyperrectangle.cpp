@@ -1,6 +1,6 @@
 #include <omp.h>
 #include <iostream>
-#include "project/hyperrectangle.hpp"
+#include "../include/project/hyperrectangle.hpp"
 
 constexpr double PI = 3.14159265358979323846;
 

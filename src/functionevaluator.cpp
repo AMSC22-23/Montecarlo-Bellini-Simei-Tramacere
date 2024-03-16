@@ -1,4 +1,4 @@
-#include "project/functionevaluator.hpp"
+#include "../include/project/functionevaluator.hpp"
 #include <chrono>
 
 double evaluateFunction(const std::string &expression, const std::vector<double> &point, mu::Parser &parser)

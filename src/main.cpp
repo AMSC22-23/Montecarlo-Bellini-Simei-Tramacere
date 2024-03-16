@@ -4,20 +4,21 @@
 #include <chrono>
 #include <omp.h>
 #include <iomanip>
+//#include <cblas.h>
 
-#include "muParser.h"
-#include "muParser.cpp"
-#include "muParserBase.cpp"
-#include "muParserBytecode.cpp"
-#include "muParserCallback.cpp"
-#include "muParserError.cpp"
-#include "muParserTokenReader.cpp"
+#include "../include/muparser-2.3.4/include/muParser.h"
+#include "../include/muparser-2.3.4/src/muParser.cpp"
+#include "../include/muparser-2.3.4/src/muParserBase.cpp"
+#include "../include/muparser-2.3.4/src/muParserBytecode.cpp"
+#include "../include/muparser-2.3.4/src/muParserCallback.cpp"
+#include "../include/muparser-2.3.4/src/muParserError.cpp"
+#include "../include/muparser-2.3.4/src/muParserTokenReader.cpp"
 
-#include "project/inputmanager.hpp"
-#include "project/hypersphere.hpp"
-#include "project/hyperrectangle.hpp"
-#include "project/hypercube.hpp"
-#include "project/asset.hpp"
+#include "../include/project/inputmanager.hpp"
+#include "../include/project/hypersphere.hpp"
+#include "../include/project/hyperrectangle.hpp"
+#include "../include/project/hypercube.hpp"
+#include "../include/project/asset.hpp"
 
 
 int main()

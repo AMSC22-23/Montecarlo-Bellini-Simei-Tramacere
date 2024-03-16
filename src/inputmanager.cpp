@@ -1,4 +1,4 @@
-#include "project/inputmanager.hpp"
+#include "../include/project/inputmanager.hpp"
 #include <iostream>
 #include <chrono>
 #include <vector>
