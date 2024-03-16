@@ -1,5 +1,5 @@
-#ifndef ASSET_HPP
-#define ASSET_HPP
+#pragma once
+
 
 #include <iostream>
 #include <fstream>
@@ -27,7 +27,3 @@ private:
     double closing_price;
 
 };
-
-
-
-#endif

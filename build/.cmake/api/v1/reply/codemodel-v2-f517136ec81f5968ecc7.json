@@ -1,0 +1,69 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Release-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"name" : "Release",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "OptionPricing",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "OptionPricing::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-OptionPricing-Release-c59629ff655b1f614c75.json",
+					"name" : "OptionPricing",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "mainOmp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-mainOmp-Release-54bc7b57b912e297c21f.json",
+					"name" : "mainOmp",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/Users/lucasimei/Documents/Uni-HPC/polimi/amsc23-24/Montecarlo/Montecarlo-Bellini-Simei-Tramacere/build",
+		"source" : "/Users/lucasimei/Documents/Uni-HPC/polimi/amsc23-24/Montecarlo/Montecarlo-Bellini-Simei-Tramacere"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 6
+	}
+}

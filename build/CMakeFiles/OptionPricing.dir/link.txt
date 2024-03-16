@@ -1,0 +1,2 @@
+/usr/bin/ar qc libOptionPricing.a CMakeFiles/OptionPricing.dir/src/asset.cpp.o CMakeFiles/OptionPricing.dir/src/functionevaluator.cpp.o CMakeFiles/OptionPricing.dir/src/hypercube.cpp.o CMakeFiles/OptionPricing.dir/src/hyperrectangle.cpp.o CMakeFiles/OptionPricing.dir/src/hypersphere.cpp.o CMakeFiles/OptionPricing.dir/src/inputmanager.cpp.o
+/usr/bin/ranlib libOptionPricing.a

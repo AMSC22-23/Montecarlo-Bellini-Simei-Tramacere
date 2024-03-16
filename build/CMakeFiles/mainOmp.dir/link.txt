@@ -1,0 +1,5 @@
+/usr/local/opt/llvm/bin/clang++  -Xpreprocessor -fopenmp -I/usr/local/opt/libomp/include -O3 -DNDEBUG -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/mainOmp.dir/src/main.cpp.o -o mainOmp   -L"/usr/local/Cellar/libomp/18.1.1/lib
+        /usr/local/Cellar/llvm/17.0.6_1/lib
+        /usr/local/opt/libomp/lib"  -Wl,-rpath,"/usr/local/Cellar/libomp/18.1.1/lib
+        /usr/local/Cellar/llvm/17.0.6_1/lib
+        /usr/local/opt/libomp/lib" libOptionPricing.a libOptionPricing.a -fopenmp -Wopenmp-simd -llibomp -llibgomp -llibiomp5 -llibomp -llibgomp -llibiomp5 

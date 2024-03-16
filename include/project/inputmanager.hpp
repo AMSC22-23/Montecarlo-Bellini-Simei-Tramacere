@@ -1,5 +1,5 @@
-#ifndef PROJECT_INPUTMANAGER_
-    #define PROJECT_INPUTMANAGER_
+#pragma once
+
 
 #include <string>
 #include <vector>
@@ -8,5 +8,3 @@
 void input_manager( int &n, int &dim, double &rad, double &edge, std::string &function, std::string &domain_type, std::vector<double> &hyper_rectangle_bounds);
 
 int csv_reader(const std::string& filename, Asset* asset_ptr);
-
-#endif

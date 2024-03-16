@@ -1,5 +1,5 @@
-#ifndef PROJECT_FUNCTIONEVALUATOR_
-    #define PROJECT_FUNCTIONEVALUATOR_
+#pragma once
+
 
 #include <string>
 #include <vector>
@@ -7,5 +7,3 @@
 #include <chrono>
 
 double evaluateFunction(const std::string &expression, const std::vector<double> &point, mu::Parser &parser);
-
-#endif // PROJECT_FUNCTIONEVALUATOR_

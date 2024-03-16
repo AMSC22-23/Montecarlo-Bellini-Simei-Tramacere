@@ -1,5 +1,5 @@
-#ifndef PROJECT_HYPERCUBE_
-    #define PROJECT_HYPERCUBE_
+#pragma once
+
 
 #include <random>
 #include <vector>
@@ -25,5 +25,3 @@ protected:
     std::random_device rd;
     std::default_random_engine eng;
 };
-
-#endif
