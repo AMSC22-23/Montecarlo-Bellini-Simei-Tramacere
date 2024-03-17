@@ -73,15 +73,15 @@ CMakeFiles/mainOmp.dir/src/main.cpp.o: CMakeFiles/mainOmp.dir/flags.make
 CMakeFiles/mainOmp.dir/src/main.cpp.o: /Users/lucasimei/Documents/Uni-HPC/polimi/amsc23-24/Montecarlo/Montecarlo-Bellini-Simei-Tramacere/src/main.cpp
 CMakeFiles/mainOmp.dir/src/main.cpp.o: CMakeFiles/mainOmp.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/lucasimei/Documents/Uni-HPC/polimi/amsc23-24/Montecarlo/Montecarlo-Bellini-Simei-Tramacere/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/mainOmp.dir/src/main.cpp.o"
-	/usr/local/opt/llvm/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/mainOmp.dir/src/main.cpp.o -MF CMakeFiles/mainOmp.dir/src/main.cpp.o.d -o CMakeFiles/mainOmp.dir/src/main.cpp.o -c /Users/lucasimei/Documents/Uni-HPC/polimi/amsc23-24/Montecarlo/Montecarlo-Bellini-Simei-Tramacere/src/main.cpp
+	/usr/local/Cellar/llvm/17.0.6_1/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/mainOmp.dir/src/main.cpp.o -MF CMakeFiles/mainOmp.dir/src/main.cpp.o.d -o CMakeFiles/mainOmp.dir/src/main.cpp.o -c /Users/lucasimei/Documents/Uni-HPC/polimi/amsc23-24/Montecarlo/Montecarlo-Bellini-Simei-Tramacere/src/main.cpp
 
 CMakeFiles/mainOmp.dir/src/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/mainOmp.dir/src/main.cpp.i"
-	/usr/local/opt/llvm/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/lucasimei/Documents/Uni-HPC/polimi/amsc23-24/Montecarlo/Montecarlo-Bellini-Simei-Tramacere/src/main.cpp > CMakeFiles/mainOmp.dir/src/main.cpp.i
+	/usr/local/Cellar/llvm/17.0.6_1/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/lucasimei/Documents/Uni-HPC/polimi/amsc23-24/Montecarlo/Montecarlo-Bellini-Simei-Tramacere/src/main.cpp > CMakeFiles/mainOmp.dir/src/main.cpp.i
 
 CMakeFiles/mainOmp.dir/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/mainOmp.dir/src/main.cpp.s"
-	/usr/local/opt/llvm/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/lucasimei/Documents/Uni-HPC/polimi/amsc23-24/Montecarlo/Montecarlo-Bellini-Simei-Tramacere/src/main.cpp -o CMakeFiles/mainOmp.dir/src/main.cpp.s
+	/usr/local/Cellar/llvm/17.0.6_1/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/lucasimei/Documents/Uni-HPC/polimi/amsc23-24/Montecarlo/Montecarlo-Bellini-Simei-Tramacere/src/main.cpp -o CMakeFiles/mainOmp.dir/src/main.cpp.s
 
 # Object files for target mainOmp
 mainOmp_OBJECTS = \
@@ -94,6 +94,7 @@ mainOmp: CMakeFiles/mainOmp.dir/src/main.cpp.o
 mainOmp: CMakeFiles/mainOmp.dir/build.make
 mainOmp: libOptionPricing.a
 mainOmp: libOptionPricing.a
+mainOmp: /usr/local/Cellar/llvm/17.0.6_1/lib/libomp.dylib
 mainOmp: CMakeFiles/mainOmp.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/lucasimei/Documents/Uni-HPC/polimi/amsc23-24/Montecarlo/Montecarlo-Bellini-Simei-Tramacere/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable mainOmp"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/mainOmp.dir/link.txt --verbose=$(VERBOSE)
