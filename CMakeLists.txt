@@ -49,6 +49,7 @@ add_library(OptionPricing STATIC
     src/hyperrectangle.cpp
     src/hypersphere.cpp
     src/inputmanager.cpp
+    src/montecarlo.cpp
 )
 
 add_executable(mainOmp
