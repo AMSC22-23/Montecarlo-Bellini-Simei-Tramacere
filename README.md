@@ -15,9 +15,9 @@ make
 
 ### What to expect
 The user can choose the integration domain from the following options:
-- [x] (hs) HyperSphere
-- [x] (hr) HyperRectangle
-- [x] (hc) HyperCube
+- (hs) HyperSphere
+- (hr) HyperRectangle
+- (hc) HyperCube
 
 He can then choose:
 
