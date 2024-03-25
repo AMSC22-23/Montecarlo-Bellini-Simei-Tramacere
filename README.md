@@ -1,7 +1,7 @@
-# <div align="center"> Monte Carlo Integration </div>
+# <div align="center"> MonteCarlo Integration </div>
 ## <div align="center"> Emanuele Bellini, Luca Simei, Luca Tramacere </div>
 
-This is the project for the Advanced Methods for Scientific Computing course @ Politecnico di Milano. Objective of this project is to compute the approximation of an integral over a domain in n dimensions using a Monte Carlo Algorithm.
+This is the project for the Advanced Methods for Scientific Computing course @ Politecnico di Milano. Objective of this project is to compute the approximation of an integral over a domain in n dimensions using a MonteCarlo Algorithm.
 
 ### To compile and run
 
@@ -15,9 +15,9 @@ make
 
 ### What to expect
 The user can choose the integration domain from the following options:
-- (hs) HyperSphere
-- (hr) HyperRectangle
-- (hc) HyperCube
+- [x] (hs) HyperSphere
+- [x] (hr) HyperRectangle
+- [x] (hc) HyperCube
 
 He can then choose:
 

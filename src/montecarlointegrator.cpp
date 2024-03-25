@@ -1,71 +1,21 @@
-#include <omp.h>
-#include <chrono>
-#include <utility>
+#include "../include/project/montecarlointegrator.hpp"
 
-#include "../include/project/hypersphere.hpp"
-#include "../include/project/hyperrectangle.hpp"
-#include "../include/project/hypercube.hpp"
-
-
-
-// Monte Carlo method for the HyperSphere
-std::pair<double, double> hs_montecarlo_integration(HyperSphere hs, int n, const std::string &function, int dimension) {
+std::pair<double, double> Montecarlo_integration(int n, const std::string &function, HyperCube &hypercube)
+{
     double total_value = 0.0;
     double total_squared_value = 0.0;
     double result = 0.0;
     auto start = std::chrono::high_resolution_clock::now();
-    std::vector<double> random_point_vector(dimension);
+    std::vector<double> random_point_vector(hypercube.getdimension());
 
 #pragma omp parallel private(result)
     {
         mu::Parser parser;
-
 #pragma omp for reduction(+ : total_value, total_squared_value)
-        for (int i = 0; i < n; ++i) {
-            hs.generate_random_point(random_point_vector);
-            if (!random_point_vector.empty()) {
-                result = evaluateFunction(function, random_point_vector, parser);
-                parser.ClearVar();
-                total_value += result;
-                total_squared_value += result * result;
-                hs.add_point_inside();
-            }
-        }
-    }
-
-    // calculate the integral
-    hs.calculate_volume();
-    double domain = hs.get_volume();
-    std::cout << std::endl << "Domain: " << domain << std::endl;
-    int points_inside = hs.get_points_inside();
-    double integral = total_value / static_cast<double>(points_inside) * domain;
-
-    // calculate the variance
-    double variance = total_squared_value / static_cast<double>(n) - (total_value / static_cast<double>(n)) * (total_value / static_cast<double>(n));
-    std::cout << "Variance: " << variance << std::endl;
-
-    // stop the timer
-    auto end = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-    return std::make_pair(integral, duration.count());
-}
-
-
-// Monte Carlo method for the HyperCube
-std::pair<double, double> hc_montecarlo_integration(HyperCube hc, int n, const std::string &function, int dimension) {
-    double total_value = 0.0;
-    double total_squared_value = 0.0;
-    double result = 0.0;
-    auto start = std::chrono::high_resolution_clock::now();
-    std::vector<double> random_point_vector(dimension);
-
-#pragma omp parallel private(result)
-    {
-        mu::Parser parser;
-
-#pragma omp for reduction(+ : total_value, total_squared_value)
-        for (int i = 0; i < n; ++i) {
-            hc.generate_random_point(random_point_vector);
+        for (int i = 0; i < n; ++i)
+        {
+            hypercube.generate_random_point(random_point_vector);
+            
             result = evaluateFunction(function, random_point_vector, parser);
             parser.ClearVar();
             total_value += result;
@@ -74,9 +24,8 @@ std::pair<double, double> hc_montecarlo_integration(HyperCube hc, int n, const s
     }
 
     // calculate the integral
-    hc.calculate_volume();
-    double domain = hc.get_volume();
-    std::cout << std::endl << "Domain: " << domain << std::endl;
+    hypercube.calculate_volume();
+    double domain = hypercube.get_volume();
     double integral = total_value / static_cast<double>(n) * domain;
 
     // calculate the variance
@@ -89,23 +38,23 @@ std::pair<double, double> hc_montecarlo_integration(HyperCube hc, int n, const s
     return std::make_pair(integral, duration.count());
 }
 
-
-// Monte Carlo method for the HyperRectangle
-std::pair<double, double> hr_montecarlo_integration(HyperRectangle hr, int n, const std::string &function, int dimension) {
+std::pair<double, double> Montecarlo_integration(int n, const std::string &function, HyperRectangle &hyperrectangle)
+{
     double total_value = 0.0;
     double total_squared_value = 0.0;
     double result = 0.0;
     auto start = std::chrono::high_resolution_clock::now();
-    std::vector<double> random_point_vector(dimension);
+    std::vector<double> random_point_vector(hyperrectangle.getdimension());
 
 #pragma omp parallel private(result)
     {
         mu::Parser parser;
-
 #pragma omp for reduction(+ : total_value, total_squared_value)
-        for (int i = 0; i < n; ++i) {
-            hr.generate_random_point(random_point_vector);
-            if (!random_point_vector.empty()) {
+        for (int i = 0; i < n; ++i)
+        {
+            hyperrectangle.generate_random_point(random_point_vector);
+            if (!random_point_vector.empty())
+            {
                 result = evaluateFunction(function, random_point_vector, parser);
                 parser.ClearVar();
                 total_value += result;
@@ -115,15 +64,57 @@ std::pair<double, double> hr_montecarlo_integration(HyperRectangle hr, int n, co
     }
 
     // calculate the integral
-    hr.calculate_volume();
-    double domain = hr.get_volume();
-    std::cout << std::endl << "Domain: " << domain << std::endl;
+    hyperrectangle.calculate_volume();
+    double domain = hyperrectangle.get_volume();
     double integral = total_value / static_cast<double>(n) * domain;
 
     // calculate the variance
     double variance = total_squared_value / static_cast<double>(n) - (total_value / static_cast<double>(n)) * (total_value / static_cast<double>(n));
     std::cout << "Variance: " << variance << std::endl;
     
+    // stop the timer
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    return std::make_pair(integral, duration.count());
+}
+
+std::pair<double, double> Montecarlo_integration(int n, const std::string &function, HyperSphere &hypersphere)
+
+{
+    double total_value = 0.0;
+    double total_squared_value = 0.0;
+    double result = 0.0;
+    auto start = std::chrono::high_resolution_clock::now();
+    std::vector<double> random_point_vector(hypersphere.getdimension());
+// #pragma omp parallel private(result)
+    {
+        mu::Parser parser;
+// #pragma omp for reduction(+ : total_value, total_squared_value)
+        for (int i = 0; i < n; ++i)
+        {
+            hypersphere.generate_random_point(random_point_vector);
+            if (!random_point_vector.empty())
+            {
+                result = evaluateFunction(function, random_point_vector, parser);
+                parser.ClearVar();
+                total_value += result;
+                total_squared_value += result * result;
+                hypersphere.add_point_inside();
+            }
+        }
+    }
+
+    // calculate the integral
+    hypersphere.calculate_volume();
+    double domain = hypersphere.get_volume();
+    std::cout << "domain: " << domain << std::endl;
+    int points_inside = hypersphere.get_points_inside();
+    double integral = total_value / static_cast<double>(points_inside) * domain;
+
+    // calculate the variance
+    double variance = total_squared_value / static_cast<double>(n) - (total_value / static_cast<double>(n)) * (total_value / static_cast<double>(n));
+    std::cout << "Variance: " << variance << std::endl;
+
     // stop the timer
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);

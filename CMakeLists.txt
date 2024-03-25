@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 project(OptionPricing VERSION 1.0)
-
+  
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
@@ -49,7 +49,7 @@ add_library(OptionPricing STATIC
     src/hyperrectangle.cpp
     src/hypersphere.cpp
     src/inputmanager.cpp
-    src/montecarlo.cpp
+    src/montecarlointegrator.cpp
 )
 
 add_executable(mainOmp
@@ -67,5 +67,6 @@ if(OpenMP_CXX_FOUND)
     target_link_libraries(OptionPricing OpenMP::OpenMP_CXX ${OPENMP_FLAGS} )
     target_link_libraries(mainOmp OptionPricing OpenMP::OpenMP_CXX ${OPENMP_FLAGS} )
 endif()
+
 
 

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ASSET_HPP
+#define ASSET_HPP
 
 #include <iostream>
 #include <fstream>
@@ -8,12 +9,12 @@
 
 
 class Asset {
-
 public:
     double get_mean_return() const;
     double get_std_dev() const;
     double get_closing_price() const;
     std::string get_name() const;
+
     void set_mean_return(double mean_return);
     void set_std_dev(double std_dev);
     void set_closing_price(double closing_price);
@@ -26,3 +27,7 @@ private:
     double closing_price;
 
 };
+
+
+
+#endif

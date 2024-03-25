@@ -4,7 +4,6 @@
 #include <chrono>
 #include <omp.h>
 #include <iomanip>
-//#include <cblas.h>
 
 #include "../include/muparser-2.3.4/include/muParser.h"
 #include "../include/muparser-2.3.4/include/muParserIncluder.h"
@@ -13,13 +12,12 @@
 #include "../include/project/hypersphere.hpp"
 #include "../include/project/hyperrectangle.hpp"
 #include "../include/project/hypercube.hpp"
-#include "../include/project/montecarlo.hpp"
 #include "../include/project/asset.hpp"
+#include "../include/project/montecarlointegrator.hpp"
 
 
-
-int main() {
-
+int main()
+{
     int n, dim;
     double rad, edge;
     std::string function;
@@ -27,6 +25,7 @@ int main() {
     std::vector<double> hyper_rectangle_bounds;
     std::pair<double, double> result = {0.0, 0.0};
     
+
     /*Asset asset{};
     
     std::string filename = "NVDA.csv";
@@ -36,38 +35,59 @@ int main() {
         return -1;
     }*/
 
-    // Get the input from the user
+    // get the input from the user
     input_manager(n, dim, rad, edge, function, domain_type, hyper_rectangle_bounds);
 
-    // Apply the Monte Carlo method to the HyperSphere
-    if (domain_type == "hs") {
-        HyperSphere hs(dim, rad);
-        result = hs_montecarlo_integration(hs, n, function, dim);
+    if (domain_type == "hs")
+    {
+        HyperSphere hypersphere(dim, rad);
+        if (function == "1")
+        {
+            hypersphere.calculate_volume();
+            result.first = hypersphere.get_volume();
+        }
+        else
+        {
+           // result = Montecarlo_integration_hypersphere(n, function, dim, hypersphere);
+           result = Montecarlo_integration(n, function, hypersphere);
+        }
     }
-
-    // Apply the Monte Carlo method to the HyperCube
-    else if (domain_type == "hc") {
-        HyperCube hc(dim, edge);
-        result = hc_montecarlo_integration(hc, n, function, dim);
+    else if (domain_type == "hc")
+    {
+        HyperCube hypercube(dim, edge);
+        if (function == "1")
+        {
+            hypercube.calculate_volume();
+            result.first = hypercube.get_volume();
+        }
+        else
+        {
+            result = Montecarlo_integration(n, function, hypercube);
+        }
     }
-
-    // Apply the Monte Carlo method to the HyperRectangle
-    else if (domain_type == "hr") {
-        HyperRectangle hr(dim, hyper_rectangle_bounds);
-        result = hr_montecarlo_integration(hr, n, function, dim);
+    else if (domain_type == "hr")
+    {
+        HyperRectangle hyperrectangle(dim, hyper_rectangle_bounds);
+        if (function == "1")
+        {
+            hyperrectangle.calculate_volume();
+            result.first = hyperrectangle.get_volume();
+        }
+        else
+        {
+            // result = Montecarlo_integration_hyperrectangle(n, function, dim, hyperrectangle);
+            result = Montecarlo_integration(n, function, hyperrectangle);
+        }
     }
-
-    // If the user entered an invalid domain type
-    else {
+    else
+    {
         std::cout << "Invalid input.";
-        return -1;
     }
-
-    // Print the result
     std::cout << std::endl
               << "The approximate result in " << dim << " dimensions of your integral is: " << result.first << std::endl;
     if (result.second != 0.0) 
         std::cout << "The time needed to calculate the integral is: " << result.second * 1e-6 << " seconds" << std::endl;
 
+    
     return 0;
 }
