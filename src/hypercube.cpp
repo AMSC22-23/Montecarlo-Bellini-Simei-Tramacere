@@ -28,4 +28,4 @@ void HyperCube::calculate_volume()
     std::cout << "Volume of the hypercube: " << this->volume << std::endl;
 }
 
-    int HyperCube::getdimension() { return dimension; }
+int HyperCube::getdimension() { return dimension; }

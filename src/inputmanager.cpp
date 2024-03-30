@@ -103,64 +103,11 @@ void input_manager(int &n, int &dim, double &rad, double &edge, std::string &fun
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             std::cout << "Invalid input. Please enter a positive number: ";
-            std::cin >> rad;
+            std::cin >> edge;
         }
     }
 
     // ask the user to insert the function to integrate
     std::cout << "Insert the function to integrate: ";
     std::cin >> function;
-}
-
-int csv_reader(const std::string& filename, Asset* asset_ptr)
-{
-    std::ifstream file(filename);
-    if (!file.is_open()) {
-        return -1;
-    }
-
-    std::string line;
-    // Skip the header line
-    std::getline(file, line);
-
-    double total_return_percentage = 0.0;
-    int counter = 0;
-
-    // Process each line of the file
-    while (std::getline(file, line)) {
-        std::stringstream ss(line);
-        std::string trash; // Variable to store unused fields
-        std::string temp_open; // Variable to store the open price
-        std::string temp_close; // Variable to store the close price
-        counter++;
-
-        // Extract and discard date
-        std::getline(ss, trash, ',');
-
-        // Extract and store the open price
-        std::getline(ss, temp_open, ',');
-        std::cout << temp_open << std::endl;
-
-        // Extract and discard high and low prices
-        std::getline(ss, trash, ',');
-        std::getline(ss, trash, ',');
-
-        // Extract and store the close price
-        std::getline(ss, temp_close, ',');
-        std::cout << temp_close << std::endl;
-        total_return_percentage += (std::stod(temp_close) - std::stod(temp_open)) / std::stod(temp_open);
-    }
-    
-    // Close the file
-    file.close();
-
-    // Calculate the mean return
-    double mean_return_percentage = total_return_percentage / static_cast<double>(counter);
-
-    // Update the Asset object with the accumulated values
-    if (asset_ptr) {
-        asset_ptr->set_mean_return(mean_return_percentage);
-    }
-    // Return success
-    return 0;
 }

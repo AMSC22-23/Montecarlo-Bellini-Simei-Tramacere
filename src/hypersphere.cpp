@@ -3,30 +3,41 @@
 
 constexpr double PI = 3.14159265358979323846;
 
-HyperSphere::HyperSphere(int dim, double rad) : eng(rd())
+HyperSphere::HyperSphere(int dim, double rad)
 {
     dimension = dim;
     radius = rad;
     parameter = dim / 2.0;
-    points_inside = 0;
 }
 
 void HyperSphere::generate_random_point(std::vector<double> &random_point)
 {
-    std::uniform_real_distribution<double> distribution(-radius, radius);
-    random_point.reserve(dimension);
+    std::vector<double> local_random_point(dimension);
+    double local_sum_of_squares = 0.0;
+    omp_set_num_threads(random_point.size());
 
-// #pragma omp parallel for
-    for (int i = 0; i < dimension; ++i)
-        random_point.push_back(distribution(eng));
+#pragma omp parallel
+    {
+        int thread_id = omp_get_thread_num();
+        thread_local std::default_random_engine eng(rd() + thread_id);
+        std::uniform_real_distribution<double> distribution(-radius, radius);
 
-    double sum_of_squares = 0.0;
-// #pragma omp parallel for
-    for (std::vector<double>::size_type i = 0; i < random_point.size(); ++i)
-        sum_of_squares += random_point[i] * random_point[i];
+#pragma omp for reduction(+ : local_sum_of_squares)
+        for (int i = 0; i < dimension; ++i)
+        {
+            local_random_point[i] = distribution(eng);
+            local_sum_of_squares += local_random_point[i] * local_random_point[i];
+        }
+    }
 
-    if (sum_of_squares > radius * radius)
-        random_point.clear();
+    if (local_sum_of_squares <= radius * radius)
+    {
+        std::copy(local_random_point.begin(), local_random_point.end(), random_point.begin());
+    }
+    else
+    {
+        random_point[0] = 0.0;
+    }
 }
 
 void HyperSphere::calculate_volume()
@@ -34,9 +45,4 @@ void HyperSphere::calculate_volume()
     volume = std::pow(PI, parameter) / std::tgamma(parameter + 1.0) * std::pow(radius, dimension);
 }
 
-
 int HyperSphere::getdimension() { return dimension; }
-
-void HyperSphere::add_point_inside() { ++points_inside; }
-
-int HyperSphere::get_points_inside() const { return points_inside; }

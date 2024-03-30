@@ -50,6 +50,8 @@ add_library(OptionPricing STATIC
     src/hypersphere.cpp
     src/inputmanager.cpp
     src/montecarlointegrator.cpp
+    src/csvhandler.cpp
+    src/optionpricing.cpp
 )
 
 add_executable(mainOmp
