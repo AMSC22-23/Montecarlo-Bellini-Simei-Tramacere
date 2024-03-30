@@ -75,8 +75,6 @@ int main()
         variation_percentage = (asset.get_expected_price() - asset.get_last_real_value()) / asset.get_last_real_value() * 100;
         if (variation_percentage >= 0)
             std::cout << " (+" << std::setprecision(4) << variation_percentage << "%)" << std::endl;
-        else
-            std::cout << " (-" << std::setprecision(4) << variation_percentage << "%)" << std::endl;
         std::cout << "Time taken: " << std::setprecision(6) << asset.get_time_taken() << " seconds" << std::endl;
         std::cout << std::endl;
     }
