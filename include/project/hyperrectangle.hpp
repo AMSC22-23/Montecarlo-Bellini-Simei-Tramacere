@@ -7,6 +7,7 @@
 
 #include "geometry.hpp"
 #include "functionevaluator.hpp"
+#include "asset.hpp"
 
 
 class HyperRectangle : public Geometry
@@ -14,13 +15,11 @@ class HyperRectangle : public Geometry
 public:
     HyperRectangle(int dim, std::vector<double> &hyper_rectangle_bounds);
 
-    void generate_random_point(std::vector<double> &random_point);
+    void generate_random_point(std::vector<double> &random_point, bool finance = false, const std::vector<const Asset*>& assetPtrs = std::vector<const Asset*>(), double std_dev_from_mean = 5.0);
 
     void calculate_volume();
 
     int getdimension();
-
-    std::pair<double, double> Montecarlo_integration(int n, const std::string &function, int dimension);
 
 protected:
     std::vector<double> hyper_rectangle_bounds;

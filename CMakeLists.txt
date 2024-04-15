@@ -51,7 +51,6 @@ add_library(OptionPricing STATIC
     src/inputmanager.cpp
     src/montecarlointegrator.cpp
     src/csvhandler.cpp
-    src/optionpricing.cpp
 )
 
 add_executable(mainOmp
@@ -69,6 +68,3 @@ if(OpenMP_CXX_FOUND)
     target_link_libraries(OptionPricing OpenMP::OpenMP_CXX ${OPENMP_FLAGS} )
     target_link_libraries(mainOmp OptionPricing OpenMP::OpenMP_CXX ${OPENMP_FLAGS} )
 endif()
-
-
-

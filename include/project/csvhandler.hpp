@@ -7,7 +7,7 @@
 #include <vector>
 #include <filesystem>
 #include <omp.h>
-#include<cmath>
+#include <cmath>
 
 
 #include "asset.hpp"

@@ -15,130 +15,156 @@
 #include "../include/project/asset.hpp"
 #include "../include/project/montecarlointegrator.hpp"
 #include "../include/project/csvhandler.hpp"
-#include "../include/project/optionpricing.hpp"
 
 int main()
 {
-    // Load the assets from the csv file
+      // Load the assets from the csv file
     std::vector<Asset> assets;
-    int csv_result = load_assets_from_csv("../csv/", assets);
+    int csv_result = load_assets_from_csv("../data/", assets);
     if (csv_result == -1)
     {
         std::cout << "Error loading the assets from the CSV files" << std::endl;
         return -1;
     }
-
-    // Print the assets
+    std::vector<const Asset *> assetPtrs;
     for (const auto &asset : assets)
     {
-        std::cout << "Asset: " << asset.get_name() << std::endl;
-        std::cout << "Return Mean: " << asset.get_return_mean() << std::endl;
-        std::cout << "Return standard deviation: " << asset.get_return_std_dev() << std::endl;
-        std::cout << std::endl;
+        assetPtrs.push_back(&asset);
     }
 
-    // Predict the future month for each asset
-    int iterations = 1e7;
-
-    auto start = std::chrono::high_resolution_clock::now();
-
-    #pragma omp parallel for
-    for (auto &asset : assets)
+    for (int n = 10; n < 1e8; n *= 10)
     {
-        std::random_device rd;
-        std::default_random_engine generator(rd());
-        auto start = std::chrono::high_resolution_clock::now();
-        int result = predict_price(asset, iterations, generator);
-        auto end = std::chrono::high_resolution_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+          // Predict the future month for each asset
+        int iterations = n;
 
-        asset.set_time_taken(duration.count() * 1e-6);
+          // int strike_price = calculate_strike_price(assets);
+        int strike_price = 0;
 
-        if (result == -1)
+        int std_dev_from_mean = 24;
+
+        double variance = 0.0;
+
+        std::string function = create_function(strike_price, assets);
+
+        std::vector<double> integration_bounds(assets.size() * 2);
+        if (set_integration_bounds(integration_bounds, assets, std_dev_from_mean) == -1)
         {
-            #pragma omp critical
-            std::cout << "Error predicting the future month for asset " << asset.get_name() << std::endl;
-            continue;
+            std::cout << "Error setting the integration bounds" << std::endl;
+            return -1;
         }
+
+        HyperRectangle hyperrectangle(assets.size(), integration_bounds);
+
+        std::pair<double, double> result = Montecarlo_integration(iterations, function, hyperrectangle, true, assetPtrs, std_dev_from_mean, &variance);
+
+          // Open the output file stream
+        std::ofstream outputFile("output.txt", std::ios::app);
+
+          // Check if the file is empty
+        outputFile.seekp(0, std::ios::end);
+        bool isEmpty = (outputFile.tellp() == 0);
+        outputFile.seekp(0, std::ios::beg);
+
+          // Write the title of the columns if the file is empty
+        if (isEmpty)
+        {
+              // Print asset information to the file in a table format
+            outputFile << std::left << std::setw(20) << "Asset";
+            outputFile << std::left << std::setw(20) << "Return Mean";
+            outputFile << std::left << std::setw(20) << "Return Standard Deviation\n";
+
+            for (const auto &asset : assets)
+            {
+                outputFile << std::left << std::setw(20) << asset.get_name();
+                outputFile << std::left << std::setw(20) << asset.get_return_mean();
+                outputFile << std::left << std::setw(20) << asset.get_return_std_dev() << "\n";
+            }
+            outputFile << "=============================================================================================\n";
+
+              // Write additional information to the file
+            outputFile << "The function is: " << function << "\n";
+            outputFile << "The integration bounds are: "
+                       << "\n";
+            for (size_t i = 0; i < integration_bounds.size(); i += 2)
+            {
+                outputFile << "[" << integration_bounds[i] << ", " << integration_bounds[i + 1] << "]\n";
+            }
+            outputFile << "=============================================================================================\n";
+            
+            outputFile << std::left << std::setw(15) << "Points";
+            outputFile << std::left << std::setw(15) << "Variance";
+            outputFile << std::left << std::setw(15) << "Final Price";
+            outputFile << std::left << std::setw(15) << "Time"
+                       << "\n";
+        }
+
+          // Write important data to file with increased column width
+        outputFile << std::left << std::setw(15) << iterations;
+        outputFile << std::fixed << std::setprecision(6) << std::left << std::setw(15) << variance;
+        outputFile << std::fixed << std::setprecision(6) << std::left << std::setw(15) << result.first;
+        outputFile << std::fixed << std::setprecision(6) << std::left << std::setw(15) << result.second * 1e-6 << "\n";
+
+          // Close the output file stream
+        outputFile.close();
     }
 
-    auto end = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+      /*std::cout << "===============================================================================================================" << std::endl;
+std::cout << std::endl;
 
-    // Print the assets
-    double variation_percentage = 0.0;
+int n, dim;
+double rad, edge;
+std::string function;
+std::string domain_type;
+std::vector<double> hyper_rectangle_bounds;
+std::pair<double, double> result = {0.0, 0.0};
 
-    for (const auto &asset : assets)
-    {
-        std::cout << "Expected price for asset " << asset.get_name() << ":" << std::endl;
-        std::cout << asset.get_expected_price();
-        variation_percentage = (asset.get_expected_price() - asset.get_last_real_value()) / asset.get_last_real_value() * 100;
-        if (variation_percentage >= 0)
-            std::cout << " (+" << std::setprecision(4) << variation_percentage << "%)" << std::endl;
-        std::cout << "Time taken: " << std::setprecision(6) << asset.get_time_taken() << " seconds" << std::endl;
-        std::cout << std::endl;
-    }
+      // get the input from the user
+input_manager(n, dim, rad, edge, function, domain_type, hyper_rectangle_bounds);
 
-    std::cout << "Total time taken: " << duration.count() * 1e-6 << " seconds" << std::endl;
+if (domain_type == "hs")
+{
+  HyperSphere hypersphere(dim, rad);
+  if (function == "1")
+  {
+      hypersphere.calculate_volume();
+      result.first = hypersphere.get_volume();
+  }
+  else
+  {
+      result = Montecarlo_integration(n, function, hypersphere);
+  }
+}
+else if (domain_type == "hc")
+{
+  HyperCube hypercube(dim, edge);
+  if (function == "1")
+  {
+      hypercube.calculate_volume();
+      result.first = hypercube.get_volume();
+  }
+  else
+  {
+      result = Montecarlo_integration(n, function, hypercube);
+  }
+}
+else if (domain_type == "hr")
+{
+  HyperRectangle hyperrectangle(dim, hyper_rectangle_bounds);
+  if (function == "1")
+  {
+      hyperrectangle.calculate_volume();
+      result.first = hyperrectangle.get_volume();
+  }
+  else
+  {
+      result = Montecarlo_integration(n, function, hyperrectangle);
+  }
+}
 
-    /*std::cout << "===============================================================================================================" << std::endl;
-    std::cout << std::endl;
-
-    int n, dim;
-    double rad, edge;
-    std::string function;
-    std::string domain_type;
-    std::vector<double> hyper_rectangle_bounds;
-    std::pair<double, double> result = {0.0, 0.0};
-
-    // get the input from the user
-    input_manager(n, dim, rad, edge, function, domain_type, hyper_rectangle_bounds);
-
-    if (domain_type == "hs")
-    {
-        HyperSphere hypersphere(dim, rad);
-        if (function == "1")
-        {
-            hypersphere.calculate_volume();
-            result.first = hypersphere.get_volume();
-        }
-        else
-        {
-            result = Montecarlo_integration(n, function, hypersphere);
-        }
-    }
-    else if (domain_type == "hc")
-    {
-        HyperCube hypercube(dim, edge);
-        if (function == "1")
-        {
-            hypercube.calculate_volume();
-            result.first = hypercube.get_volume();
-        }
-        else
-        {
-            result = Montecarlo_integration(n, function, hypercube);
-        }
-    }
-    else if (domain_type == "hr")
-    {
-        HyperRectangle hyperrectangle(dim, hyper_rectangle_bounds);
-        if (function == "1")
-        {
-            hyperrectangle.calculate_volume();
-            result.first = hyperrectangle.get_volume();
-        }
-        else
-        {
-            // result = Montecarlo_integration_hyperrectangle(n, function, dim, hyperrectangle);
-            result = Montecarlo_integration(n, function, hyperrectangle);
-        }
-    }
-
-    std::cout << std::endl
-              << "The approximate result in " << dim << " dimensions of your integral is: " << result.first << std::endl;
-    if (result.second != 0.0)
-        std::cout << "The time needed to calculate the integral is: " << result.second * 1e-6 << " seconds" << std::endl;
-    */
+std::cout << std::endl
+        << "The approximate result in " << dim << " dimensions of your integral is: " << result.first << std::endl;
+if (result.second != 0.0)
+  std::cout << "The time needed to calculate the integral is: " << result.second * 1e-6 << " seconds" << std::endl;
+*/
     return 0;
 }

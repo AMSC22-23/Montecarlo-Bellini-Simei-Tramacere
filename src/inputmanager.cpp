@@ -2,6 +2,7 @@
 #include <iostream>
 #include <chrono>
 #include <vector>
+#include <cmath>
 
 void input_manager(int &n, int &dim, double &rad, double &edge, std::string &function, std::string &domain_type, std::vector<double> &hyper_rectangle_bounds)
 {
@@ -110,4 +111,70 @@ void input_manager(int &n, int &dim, double &rad, double &edge, std::string &fun
     // ask the user to insert the function to integrate
     std::cout << "Insert the function to integrate: ";
     std::cin >> function;
+}
+
+std::string create_function(int k, const std::vector<Asset> &assets)
+{
+    std::string function = "max(0, (";
+
+    for (size_t i = 0; i < assets.size(); ++i)
+    {
+        function += "x" + std::to_string(i + 1) + " * " + std::to_string(assets[i].get_last_real_value());
+        if (i < assets.size() - 1)
+        {
+            function += " + ";
+        }
+    }
+
+    function += ") - " + std::to_string(k) + ")";
+    return function;
+}
+
+int calculate_strike_price(const std::vector<Asset> &assets)
+{
+    double strike_price = 0.0;
+    double spot_price = 0.0;
+    double price_trend = 0.0;
+    for (const auto &asset : assets)
+    {
+        spot_price += asset.get_last_real_value();
+        price_trend += asset.get_last_real_value() * std::pow(1.0 + asset.get_return_mean(), 24);
+
+        // debug
+        std::cout << "The spot price of the asset is: " << spot_price << std::endl;
+        std::cout << "The raw expected price of the asset is: " << price_trend << std::endl;
+    }
+    double percentile_5_spot_price = spot_price * 0.05;
+    if (price_trend < spot_price - percentile_5_spot_price)
+    {
+        strike_price = price_trend - 5.0;
+    }
+    else if (price_trend > spot_price + percentile_5_spot_price)
+    {
+        strike_price = price_trend + 5.0;
+    }
+    else
+    {
+        strike_price = spot_price;
+    }
+    return static_cast<int>(round(strike_price/ 10.0)) * 10;
+}
+
+int set_integration_bounds(std::vector<double> &integration_bounds, const std::vector<Asset> &assets, int std_dev_from_mean /* = 24 */)
+{
+    try
+    {
+        int j = 0;
+        for (size_t i = 0; i < assets.size() * 2 - 1; i += 2)
+        {
+            integration_bounds[i]     = assets[j].get_return_mean() - std_dev_from_mean * assets[j].get_return_std_dev() + 1.0;
+            integration_bounds[i + 1] = assets[j].get_return_mean() + std_dev_from_mean * assets[j].get_return_std_dev() + 1.0;
+            j++;
+        }
+    }
+    catch (const std::exception &e)
+    {
+        return -1;
+    }
+    return 0;
 }
