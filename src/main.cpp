@@ -34,20 +34,22 @@ int main()
 
     std::cout << "The assets have been loaded successfully. Calculating the price... " << std::endl;
 
-      // Loop through the number of iterations
-    for (int n = 10; n < 1e8; n *= 10)
+    // Loop through the number of iterations
+    for (int n = 10; n < 1e9; n *= 10)
     {
-          // Predict the future month for each asset
+        // Predict the future month for each asset
         int iterations = n;
 
-          int strike_price = calculate_strike_price(assets);
+        int strike_price = calculate_strike_price(assets);
         // int strike_price = 0;
 
         int std_dev_from_mean = 24;
 
         double variance = 0.0;
 
-        std::string function = create_function(strike_price, assets);
+        std::pair<std::string,std::vector<double>> function_pair = create_function(strike_price, assets);
+        auto function = function_pair.first;
+        auto coefficients = function_pair.second;
 
         std::vector<double> integration_bounds(assets.size() * 2);
         if (set_integration_bounds(integration_bounds, assets, std_dev_from_mean) == -1)
@@ -58,7 +60,9 @@ int main()
 
         HyperRectangle hyperrectangle(assets.size(), integration_bounds);
 
-        std::pair<double, double> result = Montecarlo_integration(iterations, function, hyperrectangle, true, assetPtrs, std_dev_from_mean, &variance);
+        std::pair<double, double> result = Montecarlo_integration(iterations, function, hyperrectangle, 
+                                                                  true, assetPtrs, std_dev_from_mean, &variance, 
+                                                                  coefficients, strike_price);
 
           // Open the output file stream
         std::ofstream outputFile("output.txt", std::ios::app);

@@ -39,7 +39,10 @@ std::pair<double, double> Montecarlo_integration(int n, const std::string &funct
     return std::make_pair(integral, duration.count());
 }
 
-std::pair<double, double> Montecarlo_integration(int n, const std::string &function, HyperRectangle &hyperrectangle, bool finance /* = false */, const std::vector<const Asset *> &assetPtrs /* = std::vector<const Asset*>() */, double std_dev_from_mean /* = 5.0 */, double* variance /* = nullptr */)
+std::pair<double, double> Montecarlo_integration(int n, const std::string &function, HyperRectangle &hyperrectangle, 
+    bool finance /* = false */, const std::vector<const Asset *> &assetPtrs /* = std::vector<const Asset*>() */, 
+    double std_dev_from_mean /* = 5.0 */, double* variance /* = nullptr */, 
+    std::vector<double> coefficients, int strike_price)
 {
     double total_value         = 0.0;
     double total_squared_value = 0.0;
@@ -75,27 +78,42 @@ std::pair<double, double> Montecarlo_integration(int n, const std::string &funct
     }
     else
     {
-        std::vector<double> random_point_vector(assetPtrs.size());
-#pragma omp parallel private(result)
+
+#pragma omp parallel
         {
-            mu::Parser parser;
+            double total_value_thread = 0.0;
+            double total_squared_value_thread = 0.0;
+            std::vector<double> random_point_vector(assetPtrs.size());
 #pragma omp for reduction(+ : total_value, total_squared_value)
             for (int i = 0; i < n; ++i)
             {
+
                 hyperrectangle.generate_random_point(random_point_vector, finance, assetPtrs, std_dev_from_mean);
+    
                 if (!random_point_vector.empty())
                 {
-                    result = evaluateFunction(function, random_point_vector, parser);
-                    parser.ClearVar();
 
-                    total_value         += result;
-                    total_squared_value += result * result;
+                    result = 0.0;
+                    for (size_t i = 0; i < random_point_vector.size(); ++i) {
+                        result += random_point_vector[i] * coefficients[i];
+                    }
+
+                    result = std::max(0.0, (result - strike_price));
+
+                    total_value_thread         += result;
+                    total_squared_value_thread += result * result;
                 }
                 else
                 {
                     std::cout << "Error generating random point" << std::endl;
                     i--;
                 }
+            }
+
+            #pragma omp critical
+            {
+                total_value += total_value_thread;
+                total_squared_value += total_squared_value_thread;
             }
         }
     }

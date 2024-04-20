@@ -113,13 +113,16 @@ void input_manager(int &n, int &dim, double &rad, double &edge, std::string &fun
     std::cin >> function;
 }
 
-std::string create_function(int k, const std::vector<Asset> &assets)
+std::pair<std::string,std::vector<double>> create_function(int k, const std::vector<Asset> &assets)
 {
+    std::vector<double> coefficients;
+    std::pair<std::string,std::vector<double>> result;
     std::string function = "max(0, (";
 
     for (size_t i = 0; i < assets.size(); ++i)
     {
-        function += "x" + std::to_string(i + 1) + " * " + std::to_string(assets[i].get_last_real_value());
+        coefficients.push_back(assets[i].get_last_real_value());
+        function += "x" + std::to_string(i + 1) + " * " + std::to_string(coefficients[i]);
         if (i < assets.size() - 1)
         {
             function += " + ";
@@ -127,7 +130,8 @@ std::string create_function(int k, const std::vector<Asset> &assets)
     }
 
     function += ") - " + std::to_string(k) + ")";
-    return function;
+    
+    return std::make_pair(function, coefficients);
 }
 
 int calculate_strike_price(const std::vector<Asset> &assets)
