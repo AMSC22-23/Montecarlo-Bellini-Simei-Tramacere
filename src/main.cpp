@@ -32,13 +32,16 @@ int main()
         assetPtrs.push_back(&asset);
     }
 
+    std::cout << "The assets have been loaded successfully. Calculating the price... " << std::endl;
+
+      // Loop through the number of iterations
     for (int n = 10; n < 1e8; n *= 10)
     {
           // Predict the future month for each asset
         int iterations = n;
 
-          // int strike_price = calculate_strike_price(assets);
-        int strike_price = 0;
+          int strike_price = calculate_strike_price(assets);
+        // int strike_price = 0;
 
         int std_dev_from_mean = 24;
 
@@ -91,21 +94,22 @@ int main()
             }
             outputFile << "=============================================================================================\n";
             
-            outputFile << std::left << std::setw(15) << "Points";
-            outputFile << std::left << std::setw(15) << "Variance";
-            outputFile << std::left << std::setw(15) << "Final Price";
-            outputFile << std::left << std::setw(15) << "Time"
+            outputFile << std::left << std::setw(25) << "Points";
+            outputFile << std::left << std::setw(25) << "Variance";
+            outputFile << std::left << std::setw(25) << "E[option payoff]";
+            outputFile << std::left << std::setw(25) << "Time"
                        << "\n";
         }
 
           // Write important data to file with increased column width
-        outputFile << std::left << std::setw(15) << iterations;
-        outputFile << std::fixed << std::setprecision(6) << std::left << std::setw(15) << variance;
-        outputFile << std::fixed << std::setprecision(6) << std::left << std::setw(15) << result.first;
-        outputFile << std::fixed << std::setprecision(6) << std::left << std::setw(15) << result.second * 1e-6 << "\n";
+        outputFile << std::left << std::setw(25) << iterations;
+        outputFile << std::fixed << std::setprecision(6) << std::left << std::setw(25) << variance;
+        outputFile << std::fixed << std::setprecision(6) << std::left << std::setw(25) << result.first;
+        outputFile << std::fixed << std::setprecision(6) << std::left << std::setw(25) << result.second * 1e-6 << "\n";
 
           // Close the output file stream
         outputFile.close();
+        std::cout << "The integral has been calculated successfully for " << iterations << " points" << std::endl;
     }
 
       /*std::cout << "===============================================================================================================" << std::endl;

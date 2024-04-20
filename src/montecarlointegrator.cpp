@@ -107,6 +107,7 @@ std::pair<double, double> Montecarlo_integration(int n, const std::string &funct
 
       // calculate the variance
     *variance = total_squared_value / static_cast<double>(n) - (total_value / static_cast<double>(n)) * (total_value / static_cast<double>(n));
+    *variance = sqrt( *variance  / static_cast<double>(n) );
 
       // stop the timer
     auto end      = std::chrono::high_resolution_clock::now();

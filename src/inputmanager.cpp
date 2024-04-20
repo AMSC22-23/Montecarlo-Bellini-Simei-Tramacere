@@ -140,9 +140,6 @@ int calculate_strike_price(const std::vector<Asset> &assets)
         spot_price += asset.get_last_real_value();
         price_trend += asset.get_last_real_value() * std::pow(1.0 + asset.get_return_mean(), 24);
 
-        // debug
-        std::cout << "The spot price of the asset is: " << spot_price << std::endl;
-        std::cout << "The raw expected price of the asset is: " << price_trend << std::endl;
     }
     double percentile_5_spot_price = spot_price * 0.05;
     if (price_trend < spot_price - percentile_5_spot_price)
