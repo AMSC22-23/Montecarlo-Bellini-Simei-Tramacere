@@ -99,7 +99,7 @@ int main()
             outputFile << "=============================================================================================\n";
             
             outputFile << std::left << std::setw(25) << "Points";
-            outputFile << std::left << std::setw(25) << "Variance";
+            outputFile << std::left << std::setw(25) << "Error";
             outputFile << std::left << std::setw(25) << "E[option payoff]";
             outputFile << std::left << std::setw(25) << "Time"
                        << "\n";

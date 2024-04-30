@@ -44,9 +44,9 @@ void HyperRectangle::generate_random_point(std::vector<double> &random_point, bo
                 }
 
                 // Check if the return is within the bounds
-                double normalized_price = price / assetPtrs[i]->get_last_real_value();
-                if (normalized_price > assetPtrs[i]->get_return_mean() + std_dev_from_mean * assetPtrs[i]->get_return_std_dev() + 1.0 ||
-                    normalized_price < assetPtrs[i]->get_return_mean() - std_dev_from_mean * assetPtrs[i]->get_return_std_dev() + 1.0)
+                double predicted_return = price / assetPtrs[i]->get_last_real_value();
+                if (predicted_return > assetPtrs[i]->get_return_mean() + std_dev_from_mean * assetPtrs[i]->get_return_std_dev() + 1.0 ||
+                    predicted_return < assetPtrs[i]->get_return_mean() - std_dev_from_mean * assetPtrs[i]->get_return_std_dev() + 1.0)
                 {
                     i--;
                     // std::cout << "Price out of bounds" << std::endl;
@@ -56,7 +56,7 @@ void HyperRectangle::generate_random_point(std::vector<double> &random_point, bo
                 {
                     #pragma omp critical
                     {
-                        random_point[i] = normalized_price;
+                        random_point[i] = predicted_return;
                     }
                 }
             }
