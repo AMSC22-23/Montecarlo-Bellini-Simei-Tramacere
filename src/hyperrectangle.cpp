@@ -6,7 +6,7 @@ HyperRectangle::HyperRectangle(int dim, std::vector<double> &hyper_rectangle_bou
 void HyperRectangle::generateRandomPoint(std::vector<double> &random_point)
 {
     int j = 0;
-    for (int i = 0; i < dimension * 2 - 1; i += 2)
+    for (size_t i = 0; i < dimension * 2 - 1; i += 2)
     {
         std::uniform_real_distribution<double> distribution(hyper_rectangle_bounds[i], hyper_rectangle_bounds[i + 1]);
         random_point[j] = distribution(eng);
@@ -21,13 +21,13 @@ void HyperRectangle::financeGenerateRandomPoint(std::vector<double> &random_poin
         thread_local std::mt19937 eng(std::random_device{}());
 
 #pragma omp parallel for
-        for (size_t i = 0; i < assetPtrs.size(); i++)
+        for (size_t i = 0; i < assetPtrs.size(); ++i)
         {
             std::normal_distribution<double> distribution(assetPtrs[i]->getReturnMean(), assetPtrs[i]->getReturnStdDev());
             double price = assetPtrs[i]->getLastRealValue();
 
               // Generate a new return for each day of the month
-            for (int day = 0; day < 24; ++day)
+            for (size_t day = 0; day < 24; ++day)
             {
                 price = price * (1 + distribution(eng));
             }
@@ -58,7 +58,7 @@ void HyperRectangle::financeGenerateRandomPoint(std::vector<double> &random_poin
 
 void HyperRectangle::calculateVolume()
 {
-    for (int i = 0; i < 2 * dimension - 1; i += 2)
+    for (size_t i = 0; i < 2 * dimension - 1; i += 2)
     {
         volume *= (hyper_rectangle_bounds[i + 1] - hyper_rectangle_bounds[i]);
     }

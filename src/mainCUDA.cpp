@@ -1,20 +1,14 @@
 #include <iostream>
-#include <vector>
-#include <string>
 #include <chrono>
-#include <omp.h>
+#include <fstream>
 #include <iomanip>
-
-#include "../include/muparser-2.3.4/include/muParser.h"
-#include "../include/muparser-2.3.4/include/muParserIncluder.h"
-
-#include "../include/project/inputmanager.hpp"
-#include "../include/project/hypersphere.hpp"
 #include "../include/project/hyperrectangle.hpp"
-#include "../include/project/hypercube.hpp"
 #include "../include/project/asset.hpp"
-#include "../include/project/montecarlointegrator.hpp"
-#include "../include/project/csvhandler.hpp"
+#include "../include/project/financecomputation.hpp"
+#include "../include/project/asset.hpp"
+#include "../include/project/financemontecarlo.hpp"
+#include "../include/project/optionparameters.hpp"
+#include "../include/project/financeinputmanager.hpp"
 
 extern std::pair<double, double> kernel_wrapper(long long int N, const std::string &function, HyperRectangle &hyperrectangle,
                                                 const std::vector<const Asset *> &assetPtrs /* = std::vector<const Asset*>() */,
@@ -34,7 +28,7 @@ int main(int argc, char **argv)
 
   // Load the assets from the csv file
   std::vector<Asset> assets;
-  int csv_result = load_assets_from_csv("../data/", assets);
+  int csv_result = loadAssets("../data/", assets);
   if (csv_result == -1)
   {
     std::cout << "Error loading the assets from the CSV files" << std::endl;
@@ -49,15 +43,15 @@ int main(int argc, char **argv)
   printf("Pricing the option ...\n");
   // Get starting timepoint
   auto start = high_resolution_clock::now();
-  strike_price = calculate_strike_price(assets);
+  strike_price = calculateStrikePrice(assets);
 
   // std::string function = create_function(strike_price, assets);
-  std::pair<std::string, std::vector<double>> function_pair = create_function(strike_price, assets);
+  std::pair<std::string, std::vector<double>> function_pair = createPayoffFunction(strike_price, assets);
   auto function = function_pair.first;
   auto coefficients = function_pair.second;
 
   std::vector<double> integration_bounds(assets.size() * 2);
-  if (set_integration_bounds(integration_bounds, assets, std_dev_from_mean) == -1)
+  if (getIntegrationBounds(integration_bounds, assets, std_dev_from_mean) == -1)
   {
     std::cout << "Error setting the integration bounds" << std::endl;
     return -1;
@@ -87,9 +81,9 @@ int main(int argc, char **argv)
 
     for (const auto &asset : assets)
     {
-      outputFile << std::left << std::setw(20) << asset.get_name();
-      outputFile << std::left << std::setw(20) << asset.get_return_mean();
-      outputFile << std::left << std::setw(20) << asset.get_return_std_dev() << "\n";
+      outputFile << std::left << std::setw(20) << asset.getName();
+      outputFile << std::left << std::setw(20) << asset.getReturnMean();
+      outputFile << std::left << std::setw(20) << asset.getReturnStdDev() << "\n";
     }
     outputFile << "=============================================================================================\n";
 

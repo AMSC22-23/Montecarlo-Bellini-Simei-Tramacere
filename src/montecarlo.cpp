@@ -17,7 +17,7 @@ std::pair<double, double> montecarloIntegration(int n, const std::string &functi
     {
         mu::Parser parser;
 #pragma omp for reduction(+ : total_value, total_squared_value)
-        for (int i = 0; i < n; ++i)
+        for (size_t i = 0; i < n; ++i)
         {
             hypercube.generateRandomPoint(random_point_vector);
 
@@ -62,7 +62,7 @@ std::pair<double, double> montecarloIntegration(int n, const std::string &functi
         mu::Parser parser;
 
 #pragma omp for reduction(+ : total_value, total_squared_value)
-        for (int i = 0; i < n; ++i)
+        for (size_t i = 0; i < n; ++i)
         {
             hyperrectangle.generateRandomPoint(random_point_vector);
             if (!random_point_vector.empty())
@@ -113,7 +113,7 @@ std::pair<double, double> montecarloIntegration(int n, const std::string &functi
     {
         mu::Parser parser;
 #pragma omp for reduction(+ : total_value, total_squared_value)
-        for (int i = 0; i < n; ++i)
+        for (size_t i = 0; i < n; ++i)
         {
             hypersphere.generateRandomPoint(random_point_vector);
 

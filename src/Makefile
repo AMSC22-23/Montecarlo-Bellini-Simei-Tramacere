@@ -8,8 +8,7 @@ NVCCFLAGS = -Xcompiler -fopenmp
 
 # Targets
 TARGET = ../buildCUDA/mainCUDA
-CUDA_OBJ = mainCUDA.o optionpricer.o asset.o csvhandler.o functionevaluator.o hypercube.o hyperrectangle.o hypersphere.o inputmanager.o
-
+CUDA_OBJ = mainCUDA.o optionpricer.o hyperrectangle.o financecomputation.o financemontecarlo.o optionparameters.o financeinputmanager.o
 # Libraries
 LIBS = -lcurand
 
@@ -22,29 +21,24 @@ $(TARGET): $(CUDA_OBJ)
 mainCUDA.o: mainCUDA.cpp
 	$(CXX) -c $< $(CXXFLAGS)
 
-asset.o: asset.cpp
-	$(CXX) -c $< $(CXXFLAGS)
-
-csvhandler.o: csvhandler.cpp
-	$(CXX) -c $< $(CXXFLAGS)
-
-functionevaluator.o: functionevaluator.cpp
-	$(CXX) -c $< $(CXXFLAGS)
-
-hypercube.o: hypercube.cpp
-	$(CXX) -c $< $(CXXFLAGS)
+optionpricer.o: optionpricer.cu
+	$(NVCC) -c $< $(NVCCFLAGS)
 
 hyperrectangle.o: hyperrectangle.cpp
 	$(CXX) -c $< $(CXXFLAGS)
 
-hypersphere.o: hypersphere.cpp
+financecomputation.o: ../utils/financecomputation.cpp
 	$(CXX) -c $< $(CXXFLAGS)
 
-inputmanager.o: inputmanager.cpp
+financemontecarlo.o: financemontecarlo.cpp
 	$(CXX) -c $< $(CXXFLAGS)
 
-optionpricer.o: optionpricer.cu
-	$(NVCC) -c $< $(NVCCFLAGS)
+optionparameters.o: optionparameters.cpp
+	$(CXX) -c $< $(CXXFLAGS)
+
+financeinputmanager.o: ../utils/financeinputmanager.cpp
+	$(CXX) -c $< $(CXXFLAGS)
+
 
 clean:
 	rm -f $(TARGET) $(CUDA_OBJ)

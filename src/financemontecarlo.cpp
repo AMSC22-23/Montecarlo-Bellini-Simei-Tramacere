@@ -16,7 +16,7 @@ std::pair<double, double> montecarloPricePrediction(int points, const std::strin
         double total_squared_value_thread = 0.0;
         std::vector<double> random_point_vector(assetPtrs.size());
 #pragma omp for reduction(+ : total_value, total_squared_value)
-        for (int i = 0; i < points; ++i)
+        for (size_t i = 0; i < points; ++i)
         {
 
             hyperrectangle.financeGenerateRandomPoint(random_point_vector, assetPtrs, std_dev_from_mean);

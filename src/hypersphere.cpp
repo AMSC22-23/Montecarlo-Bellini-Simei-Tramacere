@@ -19,7 +19,7 @@ void HyperSphere::generateRandomPoint(std::vector<double> &random_point)
         std::uniform_real_distribution<double> distribution(-radius, radius);
 
 #pragma omp for reduction(+ : local_sum_of_squares)
-        for (int i = 0; i < dimension; ++i)
+        for (size_t i = 0; i < dimension; ++i)
         {
             local_random_point[i] = distribution(eng);
             local_sum_of_squares += local_random_point[i] * local_random_point[i];
