@@ -8,22 +8,23 @@
 #include "geometry.hpp"
 #include "functionevaluator.hpp"
 
-
-class HyperCube : public Geometry
+class HyperCube: public Geometry
 {
-public:
-    HyperCube(int dim, double &edge);
+public: 
+    explicit HyperCube(int dim, double edge);
 
-    void generate_random_point(std::vector<double> &random_point);
+    void generateRandomPoint(std::vector<double> &random_point);
 
-    void calculate_volume();
+    void calculateVolume();
 
-    int getdimension();
+    int getDimension() const { return dimension; }
 
-    // std::pair<double, double> Montecarlo_integration(int n, const std::string &function);
+    double getVolume() const { return volume; }
 
-protected:
+protected: 
     double edge;
+    int dimension;
+    double volume;
     std::random_device rd;
     std::default_random_engine eng;
 };

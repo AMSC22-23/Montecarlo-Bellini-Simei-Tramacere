@@ -3,14 +3,10 @@
 
 constexpr double PI = 3.14159265358979323846;
 
-HyperSphere::HyperSphere(int dim, double rad)
-{
-    dimension = dim;
-    radius = rad;
-    parameter = dim / 2.0;
-}
+HyperSphere::HyperSphere(int dim, double rad) : radius(rad), parameter(dim / 2.0), volume(0.0), dimension(dim) {}
 
-void HyperSphere::generate_random_point(std::vector<double> &random_point)
+
+void HyperSphere::generateRandomPoint(std::vector<double> &random_point)
 {
     std::vector<double> local_random_point(dimension);
     double local_sum_of_squares = 0.0;
@@ -40,9 +36,7 @@ void HyperSphere::generate_random_point(std::vector<double> &random_point)
     }
 }
 
-void HyperSphere::calculate_volume()
+void HyperSphere::calculateVolume()
 {
     volume = std::pow(PI, parameter) / std::tgamma(parameter + 1.0) * std::pow(radius, dimension);
 }
-
-int HyperSphere::getdimension() { return dimension; }

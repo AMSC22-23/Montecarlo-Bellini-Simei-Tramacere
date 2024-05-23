@@ -2,30 +2,22 @@
 #include <iostream>
 #include "../include/project/hypercube.hpp"
 
-HyperCube::HyperCube(int dim, double &edge) : eng(rd())
-{
-    dimension = dim;
-    this->edge = edge;
-    volume = 1.0;
-}
+HyperCube::HyperCube(int dim, double edge)
+    : edge(edge), dimension(dim), volume(1.0), eng(rd()) {}
 
-void HyperCube::generate_random_point(std::vector<double> &random_point)
+void HyperCube::generateRandomPoint(std::vector<double>& random_point)
 {
     std::uniform_real_distribution<double> distribution(-edge / 2, edge / 2);
 
 #pragma omp parallel for
     for (int i = 0; i < dimension; ++i)
-        random_point[i] = (distribution(eng));
+        random_point[i] = distribution(eng);
 }
 
-void HyperCube::calculate_volume()
+void HyperCube::calculateVolume()
 {
-    this->volume = 1.0;
     for (int i = 0; i < dimension; ++i)
     {
-        this->volume *= this->edge;
+        volume *= edge;
     }
-    std::cout << "Volume of the hypercube: " << this->volume << std::endl;
 }
-
-int HyperCube::getdimension() { return dimension; }

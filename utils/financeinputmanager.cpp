@@ -1,7 +1,32 @@
-#include "../include/project/asset.hpp"
-#include "../include/project/csvhandler.hpp"
+#include "../include/project/financeinputmanager.hpp"
+#include <iostream>
+#include <chrono>
+#include <vector>
+#include <cmath>
+#include <fstream>
+#include <sstream>
+#include <filesystem>
 
-int load_assets_from_csv(const std::string& directory, std::vector<Asset>& assets)
+int getIntegrationBounds(std::vector<double> &integration_bounds, const std::vector<Asset> &assets, int std_dev_from_mean /* = 24 */)
+{
+    try
+    {
+        int j = 0;
+        for (size_t i = 0; i < assets.size() * 2 - 1; i += 2)
+        {
+            integration_bounds[i]     = assets[j].getReturnMean() - std_dev_from_mean * assets[j].getReturnStdDev() + 1.0;
+            integration_bounds[i + 1] = assets[j].getReturnMean() + std_dev_from_mean * assets[j].getReturnStdDev() + 1.0;
+            j++;
+        }
+    }
+    catch (const std::exception &e)
+    {
+        return -1;
+    }
+    return 0;
+}
+
+int loadAssets(const std::string &directory, std::vector<Asset> &assets)
 {
     try
     {
@@ -15,9 +40,9 @@ int load_assets_from_csv(const std::string& directory, std::vector<Asset>& asset
                   // Get the filename without the extension
                 std::string filename = entry.path().stem().string();
                   // Set the name of the asset to the filename
-                asset.set_name(filename);
+                asset.setName(filename);
                   // Read the CSV file and populate the asset object
-                int csv_result = read_csv(entry.path().string(), &asset);
+                int csv_result = extrapolateCsvData(entry.path().string(), &asset);
                   // Check if there was an error reading the CSV file
                 if (csv_result == -1)
                 {
@@ -38,11 +63,11 @@ int load_assets_from_csv(const std::string& directory, std::vector<Asset>& asset
     return 0;
 }
 
-
-int read_csv(const std::string& filename, Asset* asset_ptr)
+int extrapolateCsvData(const std::string &filename, Asset *asset_ptr)
 {
     std::ifstream file(filename);
-    if (!file.is_open()) {
+    if (!file.is_open())
+    {
         return -1;
     }
 
@@ -58,7 +83,8 @@ int read_csv(const std::string& filename, Asset* asset_ptr)
     std::vector<double> daily_returns;
 
       // Process each line of the file
-    while (std::getline(file, line)) {
+    while (std::getline(file, line))
+    {
         std::stringstream ss(line);
         std::string trash;       // Variable to store unused fields
         std::string temp_open;   // Variable to store the open price
@@ -81,7 +107,7 @@ int read_csv(const std::string& filename, Asset* asset_ptr)
         total_return_percentage += daily_returns[counter];
         counter++;
     }
-    
+
       // Close the file
     file.close();
 
@@ -89,16 +115,18 @@ int read_csv(const std::string& filename, Asset* asset_ptr)
     double return_mean_percentage = total_return_percentage / static_cast<double>(counter);
 
       // Calculate variance
-    for (int i = 0; i < counter; i++) {
+    for (int i = 0; i < counter; i++)
+    {
         squared_deviation += (daily_returns[i] - return_mean_percentage) * (daily_returns[i] - return_mean_percentage);
     }
     return_std_dev = std::sqrt(squared_deviation / static_cast<double>(counter));
 
       // Update the Asset object with the accumulated values
-    if (asset_ptr) {
-        asset_ptr->set_return_mean(return_mean_percentage);
-        asset_ptr->set_return_std_dev(return_std_dev);
-        asset_ptr->set_last_real_value(closing_price);
+    if (asset_ptr)
+    {
+        asset_ptr->setReturnMean(return_mean_percentage);
+        asset_ptr->setReturnStdDev(return_std_dev);
+        asset_ptr->setLastRealValue(closing_price);
     }
       // Return success
     return 0;

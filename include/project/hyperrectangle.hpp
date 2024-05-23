@@ -4,6 +4,8 @@
 #include <random>
 #include <vector>
 #include <cmath>
+#include <omp.h>
+#include <iostream>
 
 #include "geometry.hpp"
 #include "functionevaluator.hpp"
@@ -13,16 +15,22 @@
 class HyperRectangle : public Geometry
 {
 public:
-    HyperRectangle(int dim, std::vector<double> &hyper_rectangle_bounds);
+    explicit HyperRectangle(int dim, std::vector<double> &hyper_rectangle_bounds);
 
-    void generate_random_point(std::vector<double> &random_point, bool finance = false, const std::vector<const Asset*>& assetPtrs = std::vector<const Asset*>(), double std_dev_from_mean = 5.0);
+    void generateRandomPoint(std::vector<double> &random_point);
 
-    void calculate_volume();
+    void financeGenerateRandomPoint(std::vector<double> &random_point, const std::vector<const Asset*>& assetPtrs, double std_dev_from_mean);
+    
+    void calculateVolume();
 
-    int getdimension();
+    int getDimension() const { return dimension; }
+
+    double getVolume() const { return volume; }
 
 protected:
     std::vector<double> hyper_rectangle_bounds;
+    double volume;
+    int dimension;
     std::random_device rd;
     std::default_random_engine eng;
 };

@@ -1,16 +1,16 @@
-#ifndef PROJECT_INPUTMANAGER_
-    #define PROJECT_INPUTMANAGER_
+#ifndef INPUT_MANAGER_HPP
+#define INPUT_MANAGER_HPP
 
-#include <string>
+#include <iostream>
+#include <sstream>
+#include <limits>
 #include <vector>
-#include "asset.hpp"
 
-void input_manager( int &n, int &dim, double &rad, double &edge, std::string &function, std::string &domain_type, std::vector<double> &hyper_rectangle_bounds);
+void readInput(std::istream& input, std::string& value);
 
-std::pair<std::string,std::vector<double>> create_function(int k, const std::vector<Asset>& assets);
+template <typename T>
+bool parseInput(const std::string& input, T& value);
 
-int calculate_strike_price(const std::vector<Asset>& assets);
-
-int set_integration_bounds(std::vector<double>& integration_bounds, const std::vector<Asset>& assets, int std_dev_from_mean = 24);
+void buildIntegral(int &n, int &dim, double &rad, double &edge, std::string &function, std::string &domain_type, std::vector<double> &hyper_rectangle_bounds);
 
 #endif

@@ -1,5 +1,5 @@
 #ifndef PROJECT_HYPERSPHERE_
-#define PROJECT_HYPERSPHERE_
+    #define PROJECT_HYPERSPHERE_
 
 #include <random>
 #include <vector>
@@ -8,22 +8,24 @@
 #include "geometry.hpp"
 #include "functionevaluator.hpp"
 
-class HyperSphere : public Geometry
+class HyperSphere: public Geometry
 {
-public:
-    HyperSphere(int dim, double rad);
+public: 
+    explicit HyperSphere(int dim, double rad);
 
-    void generate_random_point(std::vector<double> &random_point);
+    void generateRandomPoint(std::vector<double> &random_point);
 
-    std::pair<double, double> Montecarlo_integration(int n, const std::string &function, int dimension);
+    void calculateVolume();
 
-    void calculate_volume();
+    int getDimension() const { return dimension; }
 
-    int getdimension();
+    double getVolume() const { return volume; }
 
-protected:
+protected: 
     double radius;
     double parameter;
+    double volume;
+    int dimension;
     std::random_device rd;
 };
 

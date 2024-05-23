@@ -1,36 +1,42 @@
 #ifndef ASSET_HPP
 #define ASSET_HPP
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
 #include <string>
-#include <vector>
 
+class Asset
+{
+public: 
+      // Constructors
+    Asset() = default;
+    Asset(const std::string &name, double return_mean, double closing_price,
+          double return_std_dev, double expected_price, double time_taken)
+        :  name(name), return_mean(return_mean), closing_price(closing_price),
+          return_std_dev(return_std_dev), expected_price(expected_price),
+          time_taken(time_taken) {}
 
-class Asset {
-public:
-    double get_return_mean() const;
-    std::string get_name() const;
-    double get_return_std_dev() const;
-    double get_last_real_value() const;
-    double get_expected_price() const;
-    double get_time_taken() const;
+      // Getters
+    double getReturnMean() const { return return_mean; }
+    std::string getName() const { return name; }
+    double getReturnStdDev() const { return return_std_dev; }
+    double getLastRealValue() const { return closing_price; }
+    double getExpectedPrice() const { return expected_price; }
+    double getTimeTaken() const { return time_taken; }
 
-    void set_return_mean(double return_mean);
-    void set_name(std::string name);
-    void set_return_std_dev(double return_std_dev);
-    void set_last_real_value(double last_real_value);
-    void set_expected_price(double expected_price);
-    void set_time_taken(double time_taken);
+      // Setters
+    void setReturnMean(double return_mean) { this->return_mean = return_mean; }
+    void setName(const std::string &name) { this->name = name; }
+    void setReturnStdDev(double return_std_dev) { this->return_std_dev = return_std_dev; }
+    void setLastRealValue(double closing_price) { this->closing_price = closing_price; }
+    void setExpectedPrice(double expected_price) { this->expected_price = expected_price; }
+    void setTimeTaken(double time_taken) { this->time_taken = time_taken; }
 
-private:
+private: 
     std::string name;
-    double return_mean;
-    double closing_price;
-    double return_std_dev;
-    double expected_price;
-    double time_taken;
+    double return_mean    = 0.0;  // Initialize to 0.0 by default
+    double closing_price  = 0.0;
+    double return_std_dev = 0.0;
+    double expected_price = 0.0;
+    double time_taken     = 0.0;
 };
 
 #endif

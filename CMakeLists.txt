@@ -43,14 +43,17 @@ include_directories(/include/muparser-2.3.4/include)
 # Library files
 add_library(OptionPricing STATIC
     src/main.cpp
-    src/asset.cpp
-    src/functionevaluator.cpp
+    utils/functionevaluator.cpp
     src/hypercube.cpp
     src/hyperrectangle.cpp
     src/hypersphere.cpp
-    src/inputmanager.cpp
-    src/montecarlointegrator.cpp
-    src/csvhandler.cpp
+    utils/inputmanager.cpp
+    src/montecarlo.cpp
+    utils/financeinputmanager.cpp
+    src/financemontecarlo.cpp
+    src/optionparameters.cpp
+    utils/financecomputation.cpp
+    utils/integrationcomputation.cpp
 )
 
 add_executable(mainOmp
