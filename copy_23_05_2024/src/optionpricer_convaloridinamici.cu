@@ -18,28 +18,34 @@ extern "C++"
 
 __global__ void generateGaussianNumbers( float *total_value, float *total_squared_value,
                                         const float *assets_returns, const float *assets_std_devs, int num_days,
-                                        long long int n, float *assets_closing_values, int strike_price)
+                                        long long int n, float *assets_closing_values, int strike_price, long long int seed
+                                         /* ,float *min */)
 {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
     float simulated_returns[4]; // TODO 4 is the maximum number of assets
     //size_t num_assets = sizeof(simulated_returns);
-    double result = 0.0;
-    double rnd_daily_return = 0.0;
+    float result = 0.0;
+    float rnd_daily_return = 0.0;
     float closing_value;
 
     if (tid < n)
     {
+        curandState_t state;
+        curand_init(seed, tid, 0, &state); // Moved outside the loop
+
         for( size_t asset_idx = 0; asset_idx < 4; asset_idx++)
         {
             closing_value = assets_closing_values[asset_idx];
-            curandState_t state;
-            curand_init(tid%100, 0, 0, &state); // Moved outside the loop
-            for (int i = 0; i < num_days; i++)
-            {
-                double return_value = curand_normal(&state);
+            
+            // for (int i = 0; i < num_days; i++)
+            // {
+                float return_value = curand_normal(&state);
                 rnd_daily_return = assets_returns[asset_idx] + assets_std_devs[asset_idx] * return_value;
                 closing_value = closing_value * (1 + rnd_daily_return);
-            }
+            // }
+
+           
+
             simulated_returns[asset_idx] = closing_value/assets_closing_values[asset_idx];
 
             if (simulated_returns[asset_idx] < assets_returns[asset_idx] - 24 * assets_std_devs[asset_idx] + 1.0){
@@ -53,7 +59,8 @@ __global__ void generateGaussianNumbers( float *total_value, float *total_square
                 continue;
             }
             else {
-                result += simulated_returns[asset_idx]*assets_closing_values[asset_idx];
+                result += closing_value;
+                // atomicAdd(&min[tid+n*asset_idx], simulated_returns[asset_idx]);
                 //printf("OK        Simulated return: %f, asset_idx: %d\n", simulated_returns[asset_idx], asset_idx);
              }
         }
@@ -65,6 +72,8 @@ __global__ void generateGaussianNumbers( float *total_value, float *total_square
 
         atomicAdd(&total_value[tid % 100000], result);
         atomicAdd(&total_squared_value[tid % 100000], result * result);
+        // printf("Min: %f, %f, %f, %f\n", min[0], min[1], min[2], min[3]);
+        // printf("Max: %f, %f, %f, %f\n", max[0], max[1], max[2], max[3]);
     }
 }
 
@@ -87,7 +96,7 @@ __global__ void printFunction(long long int n, char *function, const double *coe
 extern std::pair<double, double> kernel_wrapper(long long int n, const std::string &function, HyperRectangle &hyperrectangle,
                                                 const std::vector<const Asset *> &assetPtrs /* = std::vector<const Asset*>() */,
                                                 double std_dev_from_mean /* = 5.0 */, double *variance /* = nullptr */,
-                                                std::vector<double> coefficients, int strike_price)
+                                                std::vector<double> coefficients, double strike_price, long long int seed)
 {
     auto start = std::chrono::high_resolution_clock::now();
     dim3 threads_per_block = 256;
@@ -106,9 +115,9 @@ extern std::pair<double, double> kernel_wrapper(long long int n, const std::stri
     
 
     // Call the CUDA kernel to print the function and coefficients
-    printf("Calling CUDA kernel!\n");
-    printFunction<<<1, 1>>>(n, d_function, d_coefficients, coefficients.size());
-    printf("CUDA kernel finished!\n");
+    // printf("Calling CUDA kernel!\n");
+    // printFunction<<<1, 1>>>(n, d_function, d_coefficients, coefficients.size());
+    // printf("CUDA kernel finished!\n");
 
     // Save the assets main data
     float *d_assets_returns;
@@ -140,12 +149,53 @@ extern std::pair<double, double> kernel_wrapper(long long int n, const std::stri
     cudaMalloc(&d_total_squared_value, 100000 * sizeof(float));
     int num_days = 24;
 
+    // float values[assetPtrs.size() * n];
+    // float *d_min;
+    // cudaMalloc(&d_min, assetPtrs.size() * n * sizeof(float));
+    // cudaMemset(d_min, 0, assetPtrs.size() * n * sizeof(float));
+    // float min[assetPtrs.size()] = {1e9, 1e9, 1e9, 1e9};
+    // float max[assetPtrs.size()] = {-1e9, -1e9, -1e9, -1e9};
+    
 
 
-    generateGaussianNumbers<<<number_of_blocks, threads_per_block>>>( d_total_value, d_total_squared_value, d_assets_returns, d_assets_std_devs, num_days, n, d_assets_last_values, strike_price);
+
+    generateGaussianNumbers<<<number_of_blocks, threads_per_block>>>( d_total_value, d_total_squared_value, d_assets_returns, d_assets_std_devs, num_days, n, d_assets_last_values, strike_price, seed /*, d_min */);
     cudaDeviceSynchronize();
-    
-    
+
+    // cudaMemcpy(values, d_min, assetPtrs.size() * n * sizeof(float), cudaMemcpyDeviceToHost);
+    // for (size_t i = 0; i <n; ++i)
+    // {
+    //     for( size_t j = 0; j < assetPtrs.size()*n; j+=n)
+    //     {
+    //         if( values[i+j]<min[j/n])
+    //             min[j/n] = values[i+j];
+    //         if( values[i+j]>max[j/n])
+    //             max[j/n] = values[i+j];
+    //     }
+    // }
+
+    // double domain = 1.0;
+    // for( size_t i = 0; i < assetPtrs.size(); i++)
+    // {
+    //     printf("Min[%d]: %f\n", i, min[i]);
+    //     printf("Max[%d]: %f\n", i, max[i]);
+    //     domain = domain * (max[i] - min[i]);
+    // }
+
+    double domain = 1.0;
+    double integration_bounds[assetPtrs.size() * 2 - 1];
+    int j = 0;
+
+        for (size_t i = 0; i < assetPtrs.size() * 2 - 1; i += 2)
+        {
+            integration_bounds[i]     = assetPtrs[j]->getReturnMean() - 24 * assetPtrs[j]->getReturnStdDev() + 1.0;
+            integration_bounds[i + 1] = assetPtrs[j]->getReturnMean() + 24 * assetPtrs[j]->getReturnStdDev() + 1.0;
+            j++;
+            domain *= (integration_bounds[i + 1] - integration_bounds[i]);
+        }
+    // printf("Domain: %f\n", domain);
+
+
 
     float hostTotalValue[100000];
     float hostTotalSquaredValue[100000];
@@ -165,8 +215,10 @@ extern std::pair<double, double> kernel_wrapper(long long int n, const std::stri
 
 
     hyperrectangle.calculateVolume();
-    double domain = hyperrectangle.getVolume();
-    double integral = total_value / static_cast<double>(n) * domain;
+    double domain2 = hyperrectangle.getVolume();
+    //printf("Domain: %f\n", domain);
+    // printf("Domain old: %f\n", domain2);
+    double integral = total_value / n * domain;
 
     // calculate the variance
     *variance = total_squared_value/n - (total_value / n) * (total_value/ n);
@@ -183,13 +235,14 @@ extern std::pair<double, double> kernel_wrapper(long long int n, const std::stri
     cudaFree(d_assets_last_values);
     // cudaFree(d_simulated_returns);
 
-    printf("Integral: %f\n", integral);
-    printf("Variance: %f\n", *variance);
-    printf( "total_value: %f\n", total_value);
-    printf("total_squared_value: %f\n", total_squared_value);
+    printf("--------->Integral: %f\n", integral);
+    // printf("n: %d\n", n);
+    // printf("Variance: %f\n", *variance);
+    //   printf( "total_value: %f\n", total_value);
+    // printf("total_squared_value: %f\n", total_squared_value);
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start); // return std::make_pair(69.0, 420.0);
-
+    cudaDeviceSynchronize();
 
     return std::make_pair(integral, static_cast<double>(duration.count()));
 }

@@ -17,13 +17,13 @@ public:
 
     void calculateVolume();
 
-    int getDimension() const { return dimension; }
+    uint getDimension() const { return dimension; }
 
     double getVolume() const { return volume; }
 
 protected: 
     double edge;
-    int dimension;
+    uint dimension;
     double volume;
     std::random_device rd;
     std::default_random_engine eng;

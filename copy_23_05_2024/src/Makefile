@@ -41,4 +41,4 @@ financeinputmanager.o: ../utils/financeinputmanager.cpp
 
 
 clean:
-	rm -f $(TARGET) $(CUDA_OBJ)
+	rm -f $(CUDA_OBJ)

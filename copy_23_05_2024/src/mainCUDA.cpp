@@ -13,16 +13,18 @@
 extern std::pair<double, double> kernel_wrapper(long long int N, const std::string &function, HyperRectangle &hyperrectangle,
                                                 const std::vector<const Asset *> &assetPtrs /* = std::vector<const Asset*>() */,
                                                 double std_dev_from_mean /* = 5.0 */, double *variance /* = nullptr */,
-                                                std::vector<double> coefficients, int strike_price);
+                                                std::vector<double> coefficients, double strike_price, long long int seed);
 // extern std::pair<double, double> kernel_wrapper();
 
 int main(int argc, char **argv)
 {
+
   using namespace std::chrono;
 
   // long long int N = 4194304;
-  long long int N = 1e8;
-  int strike_price = 0;
+  // long long int N = 1e8;
+  long long int N = 1e7;
+  double strike_price = 0.0;
   int std_dev_from_mean = 24;
   double variance = 0.0;
 
@@ -59,9 +61,26 @@ int main(int argc, char **argv)
 
   HyperRectangle hyperrectangle(assets.size(), integration_bounds);
 
-  // std::pair<double, double> result = kernel_wrapper(N, function, hyperrectangle, true, assetPtrs, std_dev_from_mean, &variance);
-  std::pair<double, double> result = kernel_wrapper(N, function, hyperrectangle, assetPtrs, std_dev_from_mean, &variance,
-                                                    coefficients, strike_price);
+  long long int seed;
+  std::pair<double, double> result;
+  std::pair<double, double> result_temp;
+  result.first = 0.0;
+  result.second = 0.0;
+
+  size_t num_iterations = 100;
+  for (size_t i = 0; i < num_iterations; ++i)
+  {
+    std::mt19937 eng(std::random_device{}());
+    seed = eng();
+    std::cout << "=============================Iteration: " << i << std::endl;
+    std::cout << "Seed: " << seed << std::endl;
+    result_temp = kernel_wrapper(N, function, hyperrectangle, assetPtrs, std_dev_from_mean, &variance,
+                                 coefficients, strike_price, seed);
+    result.first += result_temp.first;
+    result.second += result_temp.second;
+    variance = 0.0;
+  }
+  result.first /= num_iterations;
 
   // Open the output file stream
   std::ofstream outputFile("output.txt", std::ios::app);
@@ -123,6 +142,5 @@ int main(int argc, char **argv)
 
   printf("Done\n");
   printf("\n");
-
   return 0;
 }

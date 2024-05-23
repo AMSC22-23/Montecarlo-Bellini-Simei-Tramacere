@@ -27,10 +27,10 @@ void HyperRectangle::financeGenerateRandomPoint(std::vector<double> &random_poin
             double price = assetPtrs[i]->getLastRealValue();
 
               // Generate a new return for each day of the month
-            for (size_t day = 0; day < 24; ++day)
-            {
+            // for (size_t day = 0; day < 24; ++day)
+            // {
                 price = price * (1 + distribution(eng));
-            }
+            // }
 
               // Check if the return is within the bounds
             double predicted_return = price / assetPtrs[i]->getLastRealValue();

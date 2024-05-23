@@ -3,7 +3,7 @@
 std::pair<double, double> montecarloPricePrediction(int points, const std::string &function, HyperRectangle &hyperrectangle,
                                                     const std::vector<const Asset *> &assetPtrs,
                                                     double std_dev_from_mean, double &variance,
-                                                    std::vector<double> coefficients, int strike_price)
+                                                    std::vector<double> coefficients, double strike_price)
 {
     double total_value         = 0.0;
     double total_squared_value = 0.0;
