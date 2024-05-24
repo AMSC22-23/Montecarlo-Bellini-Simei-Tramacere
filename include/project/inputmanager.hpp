@@ -6,11 +6,26 @@
 #include <limits>
 #include <vector>
 
-void readInput(std::istream& input, std::string& value);
+inline void readInput(std::istream &input, std::string &value)
+{
+    input >> std::ws;  // Skip whitespace
+    std::getline(input, value);
+}
 
 template <typename T>
-bool parseInput(const std::string& input, T& value);
+inline bool parseInput(const std::string &input, T &value)
+{
+    try
+    {
+        value = std::stod(input);
+        return true;
+    }
+    catch (...)
+    {
+        return false;
+    };
+}
 
-void buildIntegral(int &n, int &dim, double &rad, double &edge, std::string &function, std::string &domain_type, std::vector<double> &hyper_rectangle_bounds);
+void buildIntegral(size_t &n, size_t &dim, double &rad, double &edge, std::string &function, std::string &domain_type, std::vector<double> &hyper_rectangle_bounds);
 
 #endif

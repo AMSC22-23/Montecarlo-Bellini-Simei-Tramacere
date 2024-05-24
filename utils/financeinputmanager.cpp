@@ -7,11 +7,11 @@
 #include <sstream>
 #include <filesystem>
 
-int getIntegrationBounds(std::vector<double> &integration_bounds, const std::vector<Asset> &assets, int std_dev_from_mean /* = 24 */)
+int getIntegrationBounds(std::vector<double> &integration_bounds, const std::vector<Asset> &assets, const int std_dev_from_mean /* = 24 */)
 {
     try
     {
-        int j = 0;
+        size_t j = 0;
         for (size_t i = 0; i < assets.size() * 2 - 1; i += 2)
         {
             integration_bounds[i]     = assets[j].getReturnMean() - std_dev_from_mean * assets[j].getReturnStdDev() + 1.0;
@@ -50,7 +50,7 @@ int loadAssets(const std::string &directory, std::vector<Asset> &assets)
                     continue;  // Skip to the next file
                 }
                   // Add the asset to the vector of assets
-                assets.push_back(asset);
+                assets.emplace_back(asset);
             }
         }
     }
@@ -76,7 +76,7 @@ int extrapolateCsvData(const std::string &filename, Asset *asset_ptr)
     std::getline(file, line);
 
     double total_return_percentage = 0.0;
-    int    counter                 = 0;
+    size_t    counter                 = 0;
     double squared_deviation       = 0.0;
     double return_std_dev          = 0.0;
     double closing_price           = 0.0;
@@ -103,7 +103,7 @@ int extrapolateCsvData(const std::string &filename, Asset *asset_ptr)
           // Extract and store the close price
         std::getline(ss, temp_close, ',');
         closing_price = std::stod(temp_close);
-        daily_returns.push_back((std::stod(temp_close) - std::stod(temp_open)) / std::stod(temp_open));
+        daily_returns.emplace_back((std::stod(temp_close) - std::stod(temp_open)) / std::stod(temp_open));
         total_return_percentage += daily_returns[counter];
         counter++;
     }
@@ -115,7 +115,7 @@ int extrapolateCsvData(const std::string &filename, Asset *asset_ptr)
     double return_mean_percentage = total_return_percentage / static_cast<double>(counter);
 
       // Calculate variance
-    for (int i = 0; i < counter; i++)
+    for (size_t i = 0; i < counter; ++i)
     {
         squared_deviation += (daily_returns[i] - return_mean_percentage) * (daily_returns[i] - return_mean_percentage);
     }

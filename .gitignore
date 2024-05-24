@@ -9,3 +9,6 @@
 
 # Ignore build folder
 build/
+
+# Ignore object files
+*.o
