@@ -15,6 +15,6 @@ std::pair<double, double> montecarloPricePrediction(int points, const std::strin
                                                     double std_dev_from_mean,
                                                     double &variance,
                                                     std::vector<double> coefficients,
-                                                    double strike_price);
+                                                    double strike_price, std::vector<double> &predicted_assets_prices);
 
 #endif

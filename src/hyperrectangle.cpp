@@ -14,7 +14,7 @@ void HyperRectangle::generateRandomPoint(std::vector<double> &random_point)
     }
 }
 
-void HyperRectangle::financeGenerateRandomPoint(std::vector<double> &random_point, const std::vector<const Asset *> &assetPtrs, double std_dev_from_mean)
+void HyperRectangle::financeGenerateRandomPoint(std::vector<double> &random_point, const std::vector<const Asset *> &assetPtrs, double std_dev_from_mean, std::vector<double> &predicted_assets_prices)
 {
     try
     {

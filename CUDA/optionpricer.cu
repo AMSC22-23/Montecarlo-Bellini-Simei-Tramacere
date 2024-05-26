@@ -49,21 +49,21 @@ __global__ void generateGaussianNumbers( float *total_value, float *total_square
 
             simulated_returns[asset_idx] = closing_value/assets_closing_values[asset_idx];
 
-            if (simulated_returns[asset_idx] < assets_returns[asset_idx] - 24 * assets_std_devs[asset_idx] + 1.0){
-                //printf("Simulated return out of bounds: %f < %f\n", simulated_returns[asset_idx], assets_returns[asset_idx] - 24 * assets_std_devs[asset_idx] + 1.0);
-                asset_idx--;                
-                continue;
+            // if (simulated_returns[asset_idx] < assets_returns[asset_idx] - 24 * assets_std_devs[asset_idx] + 1.0){
+            //     //printf("Simulated return out of bounds: %f < %f\n", simulated_returns[asset_idx], assets_returns[asset_idx] - 24 * assets_std_devs[asset_idx] + 1.0);
+            //     asset_idx--;                
+            //     continue;
 
-            } else if(simulated_returns[asset_idx] > assets_returns[asset_idx] + 24 * assets_std_devs[asset_idx] + 1.0 ){
-                //printf("Simulated return out of bounds: %f > %f\n", simulated_returns[asset_idx], assets_returns[asset_idx] + 24 * assets_std_devs[asset_idx] + 1.0);
-                asset_idx--;                
-                continue;
-            }
-            else {
+            // } else if(simulated_returns[asset_idx] > assets_returns[asset_idx] + 24 * assets_std_devs[asset_idx] + 1.0 ){
+            //     //printf("Simulated return out of bounds: %f > %f\n", simulated_returns[asset_idx], assets_returns[asset_idx] + 24 * assets_std_devs[asset_idx] + 1.0);
+            //     asset_idx--;                
+            //     continue;
+            // }
+            // else {
                 result += closing_value;
                 atomicAdd(&predicted_assets_prices[asset_idx], closing_value);
                 //printf("OK        Simulated return: %f, asset_idx: %d\n", simulated_returns[asset_idx], asset_idx);
-             }            
+            //  }            
             
         }
 

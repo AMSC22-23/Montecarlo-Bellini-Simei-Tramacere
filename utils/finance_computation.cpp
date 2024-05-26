@@ -40,6 +40,7 @@ void financeComputation()
   auto function_pair = createPayoffFunction(strike_price, assets);
   auto function = function_pair.first;
   auto coefficients = function_pair.second;
+  std::vector<double> predicted_assets_prices(assets.size());
 
   std::vector<double> integration_bounds(assets.size() * 2);
   std::cout << "Calculating the price of the option..." << std::endl;
@@ -61,14 +62,23 @@ void financeComputation()
                                             std_dev_from_mean,
                                             variance,
                                             coefficients,
-                                            strike_price);
+                                            strike_price,
+                                            predicted_assets_prices);
     result.first += result_temp.first;
     result.second += result_temp.second;
-    double progress = static_cast<double>( j + 1 )/ static_cast<double>(num_iterations) * 100;
+    for (size_t i = 0; i < assets.size(); ++i)
+    {
+      predicted_assets_prices[i] /= iterations;
+    }
+    double progress = static_cast<double>(j + 1) / static_cast<double>(num_iterations) * 100;
     std::cout << "Process at " << progress << "% ...\n";
   }
   result.first /= num_iterations;
   variance /= num_iterations;
+  for (size_t i = 0; i < assets.size(); ++i)
+  {
+    predicted_assets_prices[i] /= num_iterations;
+  }
 
   std::ofstream outputFile("output.txt", std::ios::app);
   outputFile.seekp(0, std::ios::end);
@@ -126,7 +136,13 @@ void financeComputation()
   outputFile << std::fixed << std::setprecision(6) << std::left << std::setw(25) << result.first;
   outputFile << std::fixed << std::setprecision(6) << std::left << std::setw(25) << result.second * 1e-6 << "\n";
   outputFile.close();
-  std::cout << "The integral has been calculated successfully for " << iterations << " points" << std::endl << "and " << num_iterations << " times, averaging its value." << std::endl;
+  std::cout << "The integral has been calculated successfully for " << iterations << " points" << std::endl
+            << "and " << num_iterations << " times, averaging its value." << std::endl;
 
   std::cout << "\nThe results have been saved to output.txt" << std::endl;
+
+  for (size_t i = 0; i < assets.size(); ++i)
+  {
+    std::cout << "The predicted future prices (30 days) of one " << assets[i].getName() << " stock is " << predicted_assets_prices[i] << std::endl;
+  }
 }

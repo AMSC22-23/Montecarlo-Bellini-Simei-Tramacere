@@ -19,7 +19,7 @@ public:
 
     void generateRandomPoint(std::vector<double> &random_point);
 
-    void financeGenerateRandomPoint(std::vector<double> &random_point, const std::vector<const Asset*>& assetPtrs, double std_dev_from_mean);
+    void financeGenerateRandomPoint(std::vector<double> &random_point, const std::vector<const Asset*>& assetPtrs, double std_dev_from_mean, std::vector<double> &predicted_assets_prices);
     
     void calculateVolume();
 

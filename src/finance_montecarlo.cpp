@@ -3,12 +3,19 @@
 std::pair<double, double> montecarloPricePrediction(int points, const std::string &function, HyperRectangle &hyperrectangle,
                                                     const std::vector<const Asset *> &assetPtrs,
                                                     double std_dev_from_mean, double &variance,
-                                                    std::vector<double> coefficients, double strike_price)
+                                                    std::vector<double> coefficients, double strike_price, std::vector<double> &predicted_assets_prices)
 {
     double total_value         = 0.0;
     double total_squared_value = 0.0;
     double result              = 0.0;
     auto   start               = std::chrono::high_resolution_clock::now();
+
+// #pragma omp parallel {
+    for (size_t i = 0; i < assetPtrs.size(); ++i)
+    {
+        predicted_assets_prices[i] = 0;
+    }
+// }
 
 #pragma omp parallel
     {
@@ -19,7 +26,7 @@ std::pair<double, double> montecarloPricePrediction(int points, const std::strin
         for (size_t i = 0; i < points; ++i)
         {
 
-            hyperrectangle.financeGenerateRandomPoint(random_point_vector, assetPtrs, std_dev_from_mean);
+            hyperrectangle.financeGenerateRandomPoint(random_point_vector, assetPtrs, std_dev_from_mean, predicted_assets_prices);
 
             if (!random_point_vector.empty())
             {
@@ -28,6 +35,7 @@ std::pair<double, double> montecarloPricePrediction(int points, const std::strin
                 for (size_t i = 0; i < random_point_vector.size(); ++i)
                 {
                     result += random_point_vector[i] * coefficients[i];
+                    predicted_assets_prices[i] += result;
                 }
 
                 result = std::max(0.0, (result - strike_price));
