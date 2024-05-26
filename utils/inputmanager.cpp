@@ -1,105 +1,146 @@
-#include "../include/project/inputmanager.hpp"
 #include <iostream>
 #include <sstream>
 #include <limits>
 #include <iomanip>
 
+#include "../include/project/inputmanager.hpp"
 
-void readInput(std::istream& input, std::string& value) {
-    input >> std::ws; // Skip whitespace
-    std::getline(input, value);
-}
-
-template <typename T>
-bool parseInput(const std::string& input, T& value) {
-    try {
-        value = std::stod(input);
-        return true;
-    } catch (...) {
-        return false;
-    }
-}
-
-
-void buildIntegral(int &n, int &dim, double &rad, double &edge, std::string &function, std::string &domain_type, std::vector<double> &hyper_rectangle_bounds) {
-    std::cout << "Insert the type of domain you want to integrate: (hc for hyper-cube, hs for hyper-sphere, hr for hyper-rectangle)" << std::endl;
+void buildIntegral(size_t &n,
+                   size_t &dim,
+                   double &rad,
+                   double &edge,
+                   std::string &function,
+                   std::string &domain_type,
+                   std::vector<double> &hyper_rectangle_bounds)
+{
+    std::cout << "Insert the type of domain you want to integrate:\n";
+    std::cout << "  hc  - hyper-cube\n";
+    std::cout << "  hs  - hyper-sphere\n";
+    std::cout << "  hr  - hyper-rectangle\n";    
     readInput(std::cin, domain_type);
-    while ((domain_type != "hs" && domain_type != "hr" && domain_type != "hc") || domain_type.length() == 0) {
-        std::cout << "Invalid input. Please enter hc for hypercube, hs for hyper-sphere, hr for hyper-rectangle: ";
+    while ((domain_type != "hs" && domain_type != "hr" && domain_type != "hc") || domain_type.length() == 0)
+    {
+        std::cout << "Invalid input. Please enter hc for hypercube, hs for hyper-sphere, hr for hyper-rectangle:\n";
         readInput(std::cin, domain_type);
     }
 
-    std::cout << "Insert the number of random points to generate: ";
+    std::cout << "Insert the number of random points to generate:\n";
     std::string input_n;
     readInput(std::cin, input_n);
-    while (!parseInput(input_n, n) || n <= 0) {
-        std::cout << "Invalid input. Please enter a positive integer: ";
+    while (!parseInput(input_n, n) || n <= 0)
+    {
+        std::cout << "Invalid input. Please enter a positive integer:\n";
         readInput(std::cin, input_n);
     }
 
-    if (domain_type == "hs") {
-        std::cout << "Insert the dimension of the hypersphere: ";
+    if (domain_type == "hs")
+    {
+        std::cout << "Insert the dimension of the hypersphere:\n";
         std::string input_dim;
         readInput(std::cin, input_dim);
-        while (!parseInput(input_dim, dim) || dim <= 0) {
-            std::cout << "Invalid input. Please enter a positive integer: ";
+        while (!parseInput(input_dim, dim) || dim <= 0)
+        {
+            std::cout << "Invalid input. Please enter a positive integer:\n";
             readInput(std::cin, input_dim);
         }
 
-        std::cout << "Insert the radius of the hypersphere: ";
+        std::cout << "Insert the radius of the hypersphere:\n";
         std::string input_rad;
         readInput(std::cin, input_rad);
-        while (!parseInput(input_rad, rad) || rad <= 0) {
-            std::cout << "Invalid input. Please enter a positive number: ";
+        while (!parseInput(input_rad, rad) || rad <= 0)
+        {
+            std::cout << "Invalid input. Please enter a positive number:\n";
             readInput(std::cin, input_rad);
         }
-    } else if (domain_type == "hr") {
-        std::cout << "Insert the dimension of the hyperrectangle: ";
+    }
+    else if (domain_type == "hr")
+    {
+        std::cout << "Insert the dimension of the hyperrectangle:\n";
         std::string input_dim;
         readInput(std::cin, input_dim);
-        while (!parseInput(input_dim, dim) || dim <= 0) {
-            std::cout << "Invalid input. Please enter a positive integer: ";
+        while (!parseInput(input_dim, dim) || dim <= 0)
+        {
+            std::cout << "Invalid input. Please enter a positive integer:\n";
             readInput(std::cin, input_dim);
         }
 
         hyper_rectangle_bounds.reserve(dim * 2);
-        for (int i = 0; i < 2 * dim; i++) {
+        for (size_t i = 0; i < 2 * dim; i++)
+        {
             double tmp;
-            if (i == 0)
-                std::cout << "Insert the 1st dimension coordinate of the hyper-rectangle: ";
-            else if (i == 1)
-                std::cout << "Insert the 2nd dimension coordinate of the hyper-rectangle: ";
-            else if (i == 2)
-                std::cout << "Insert the 3rd dimension coordinate of the hyper-rectangle: ";
-            else
-                std::cout << "Insert the " << i+1 << "th dimension coordinate of the hyper-rectangle: ";
+            size_t      current_dimension = i / 2 + 1;
+            std::string boundType         = (i % 2 == 0) ? "lower" : "upper";
+            std::string suffix;
 
-            std::string input_tmp;
-            readInput(std::cin, input_tmp);
-            while (!parseInput(input_tmp, tmp)) {
-                std::cout << "Invalid input. Please enter a number: ";
-                readInput(std::cin, input_tmp);
+              // Determine the ordinal suffix
+            if (current_dimension % 10 == 1 && current_dimension % 100 != 11)
+            {
+                suffix = "st";
             }
-            hyper_rectangle_bounds.push_back(tmp);
+            else if (current_dimension % 10 == 2 && current_dimension % 100 != 12)
+            {
+                suffix = "nd";
+            }
+            else if (current_dimension % 10 == 3 && current_dimension % 100 != 13)
+            {
+                suffix = "rd";
+            }
+            else
+            {
+                suffix = "th";
+            }
+
+            while (true)
+            {
+                std::cout << "Insert the " << boundType << " bound of the " << current_dimension
+                          << suffix << " dimension of the hyper-rectangle:\n";
+
+                std::string input_tmp;
+                readInput(std::cin, input_tmp);
+
+                if (parseInput(input_tmp, tmp))
+                {
+                    if (boundType == "upper" && tmp <= hyper_rectangle_bounds[i - 1])
+                    {
+                        std::cout << "\nInvalid input. Upper bound must be greater than lower bound.\n"
+                                  << std::endl;
+                    }
+                    else
+                    {
+                        hyper_rectangle_bounds[i] = tmp;
+                        break;
+                    }
+                }
+                else
+                {
+                    std::cout << "\nInvalid input. Please enter a number.\n"
+                              << std::endl;
+                }
+            }
+
+            hyper_rectangle_bounds.emplace_back(tmp);
         }
-    } else if (domain_type == "hc") {
-        std::cout << "Insert the dimension of the hypercube: ";
+    }
+    else if (domain_type == "hc")
+    {
+        std::cout << "Insert the dimension of the hypercube:\n";
         std::string input_dim;
         readInput(std::cin, input_dim);
-        while (!parseInput(input_dim, dim) || dim <= 0) {
-            std::cout << "Invalid input. Please enter a positive integer: ";
+        while (!parseInput(input_dim, dim) || dim <= 0)
+        {
+            std::cout << "Invalid input. Please enter a positive integer:\n";
             readInput(std::cin, input_dim);
         }
 
-        std::cout << "Insert the edge length of the hypercube: ";
+        std::cout << "Insert the edge length of the hypercube:\n";
         std::string input_edge;
         readInput(std::cin, input_edge);
-        while (!parseInput(input_edge, edge) || edge <= 0) {
-            std::cout << "Invalid input. Please enter a positive number: ";
+        while (!parseInput(input_edge, edge) || edge <= 0)
+        {
+            std::cout << "Invalid input. Please enter a positive number:\n";
             readInput(std::cin, input_edge);
         }
     }
-
-    std::cout << "Insert the function to integrate: ";
+    std::cout << "Insert the function to integrate:\n";
     readInput(std::cin, function);
 }

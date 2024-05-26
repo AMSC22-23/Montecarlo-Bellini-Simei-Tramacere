@@ -1,6 +1,6 @@
 #include "../include/project/hyperrectangle.hpp"
 
-HyperRectangle::HyperRectangle(int dim, std::vector<double> &hyper_rectangle_bounds)
+HyperRectangle::HyperRectangle(size_t dim, std::vector<double> &hyper_rectangle_bounds)
     : hyper_rectangle_bounds(hyper_rectangle_bounds), volume(1.0), dimension(dim), eng(rd()) {}
 
 void HyperRectangle::generateRandomPoint(std::vector<double> &random_point)
@@ -14,7 +14,9 @@ void HyperRectangle::generateRandomPoint(std::vector<double> &random_point)
     }
 }
 
-void HyperRectangle::financeGenerateRandomPoint(std::vector<double> &random_point, const std::vector<const Asset *> &assetPtrs, double std_dev_from_mean, std::vector<double> &predicted_assets_prices)
+void HyperRectangle::financeGenerateRandomPoint(std::vector<double> &random_point,
+                                                const std::vector<const Asset *> &assetPtrs,
+                                                const double std_dev_from_mean)
 {
     try
     {
@@ -56,10 +58,3 @@ void HyperRectangle::financeGenerateRandomPoint(std::vector<double> &random_poin
     }
 }
 
-void HyperRectangle::calculateVolume()
-{
-    for (size_t i = 0; i < 2 * dimension - 1; i += 2)
-    {
-        volume *= (hyper_rectangle_bounds[i + 1] - hyper_rectangle_bounds[i]);
-    }
-}

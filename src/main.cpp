@@ -24,30 +24,39 @@
 
 int main()
 {
-  int choice;
-  bool validChoice = false;
+    int choice;
+    bool validChoice = false;
 
-  while (!validChoice)
-  {
-    std::cout << "Choose computation type:" << std::endl;
-    std::cout << "1. Finance Monte Carlo" << std::endl;
-    std::cout << "2. Monte Carlo Integration" << std::endl;
-    std::cin >> choice;
-
-    switch (choice)
+    while (!validChoice)
     {
-    case 1: 
-      financeComputation();
-      validChoice = true;
-      break;
-    case 2: 
-      integrationComputation();
-      validChoice = true;
-      break;
-    default: 
-      std::cout << "Invalid choice. Please enter 1 or 2." << std::endl;
-      break;
+        std::cout << "Choose computation type:" << std::endl;
+        std::cout << "1. Finance Monte Carlo" << std::endl;
+        std::cout << "2. Monte Carlo Integration" << std::endl;
+        std::cin >> choice;
+
+        if (std::cin.fail())
+        {
+            std::cin.clear ();                                                   // Clear the fail state
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Clear the input buffer
+            std::cout << "Invalid input. Please enter a number." << std::endl;
+        }
+        else
+        {
+            switch (choice)
+            {
+            case 1: 
+                financeComputation();
+                validChoice = true;
+                break;
+            case 2: 
+                integrationComputation();
+                validChoice = true;
+                break;
+            default: 
+                std::cout << "Invalid choice. Please enter 1 or 2." << std::endl;
+                break;
+            }
+        }
     }
-  }
-  return 0;
+    return 0;
 }

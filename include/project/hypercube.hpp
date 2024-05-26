@@ -11,19 +11,23 @@
 class HyperCube: public Geometry
 {
 public: 
-    explicit HyperCube(int dim, double edge);
+    explicit HyperCube(size_t dim, double edge);
 
     void generateRandomPoint(std::vector<double> &random_point);
 
-    void calculateVolume();
+    inline void calculateVolume()
+    {
+        for (size_t i = 0; i < dimension; ++i)
+            volume *= edge;
+    }
 
-    uint getDimension() const { return dimension; }
+    inline size_t getDimension() const { return dimension; }
 
-    double getVolume() const { return volume; }
+    inline double getVolume() const { return volume; }
 
 protected: 
     double edge;
-    uint dimension;
+    size_t dimension;
     double volume;
     std::random_device rd;
     std::default_random_engine eng;

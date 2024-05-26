@@ -6,7 +6,7 @@
 
 #include "asset.hpp"
 
-int getIntegrationBounds(std::vector<double> &integration_bounds, const std::vector<Asset> &assets, int std_dev_from_mean = 24);
+int getIntegrationBounds(std::vector<double> &integration_bounds, const std::vector<Asset> &assets, const int std_dev_from_mean = 24);
 
 int extrapolateCsvData(const std::string &filename, Asset *asset_ptr);
 
