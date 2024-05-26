@@ -6,12 +6,27 @@
 #include <limits>
 #include <vector>
 
+
+/**
+ * @brief Read an input from the user
+ * @details This function reads an input from the user and returns it as a string.
+ * @param input A reference to an input stream
+ * @param value A reference to a string
+ */
 inline void readInput(std::istream &input, std::string &value)
 {
-    input >> std::ws;  // Skip whitespace
+    // Skip whitespace
+    input >> std::ws;
     std::getline(input, value);
 }
 
+/**
+ * @brief Parse an input
+ * @details This function tries to parse a string into a value of type T.
+ * @param input A reference to a string
+ * @tparam value A reference to a value of type T
+ * @return True if the parsing was successful, false otherwise
+ */
 template <typename T>
 inline bool parseInput(const std::string &input, T &value)
 {
@@ -26,6 +41,18 @@ inline bool parseInput(const std::string &input, T &value)
     };
 }
 
+/**
+* @brief Build the integral
+* @details This function reads the input from the user and builds the integral.
+* @param n A reference to the number of points
+* @param dim A reference to the dimension of the integral
+* @param rad A reference to the radius of the hypersphere
+* @param edge A reference to the edge of the hypercube
+* @param function A reference to the function to integrate
+* @param domain_type A reference to the domain type
+* @param hyper_rectangle_bounds A reference to the bounds of the hyperrectangle
+*/
 void buildIntegral(size_t &n, size_t &dim, double &rad, double &edge, std::string &function, std::string &domain_type, std::vector<double> &hyper_rectangle_bounds);
+
 
 #endif
