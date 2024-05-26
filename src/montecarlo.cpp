@@ -1,14 +1,13 @@
 #include "../include/project/montecarlo.hpp"
 #include "../include/project/functionevaluator.hpp"
 
-std::pair<double, double> montecarloIntegration(size_t n, const std::string &function, HyperCube &hypercube, double &variance)
+std::pair<double, double> montecarloIntegration(int n, const std::string &function, HyperCube &hypercube, double &variance)
 {
     double total_value = 0.0;
     double total_squared_value = 0.0;
     double result = 0.0;
-    std::vector<double> random_point_vector;
-    random_point_vector.resize(hypercube.getDimension());
-    
+    std::vector<double> random_point_vector(hypercube.getDimension());
+
     std::cout << "Computing integral..." << std::endl;
 
     // start the timer
@@ -46,13 +45,12 @@ std::pair<double, double> montecarloIntegration(size_t n, const std::string &fun
     return std::make_pair(integral, duration.count());
 }
 
-std::pair<double, double> montecarloIntegration(size_t n, const std::string &function, HyperRectangle &hyperrectangle, double &variance)
+std::pair<double, double> montecarloIntegration(int n, const std::string &function, HyperRectangle &hyperrectangle, double &variance)
 {
     double total_value = 0.0;
     double total_squared_value = 0.0;
     double result = 0.0;
-    std::vector<double> random_point_vector;
-    random_point_vector.resize(hyperrectangle.getDimension());
+    std::vector<double> random_point_vector(hyperrectangle.getDimension());
 
     std::cout << "Computing integral..." << std::endl;
 
@@ -98,15 +96,14 @@ std::pair<double, double> montecarloIntegration(size_t n, const std::string &fun
     return std::make_pair(integral, static_cast<double>(duration.count()));
 }
 
-std::pair<double, double> montecarloIntegration(size_t n, const std::string &function, HyperSphere &hypersphere, double &variance)
+std::pair<double, double> montecarloIntegration(int n, const std::string &function, HyperSphere &hypersphere, double &variance)
 
 {
     double total_value = 0.0;
     double total_squared_value = 0.0;
     double result = 0.0;
-    std::vector<double> random_point_vector;
-    random_point_vector.resize(hypersphere.getDimension());
-    
+    std::vector<double> random_point_vector(hypersphere.getDimension());
+
     std::cout << "Computing integral..." << std::endl;
 
     // start the timer

@@ -1,5 +1,5 @@
 #ifndef PROJECT_HYPERCUBE_
-#define PROJECT_HYPERCUBE_
+    #define PROJECT_HYPERCUBE_
 
 #include <random>
 #include <vector>
@@ -11,23 +11,19 @@
 class HyperCube: public Geometry
 {
 public: 
-    explicit HyperCube(size_t dim, double edge);
+    explicit HyperCube(int dim, double edge);
 
     void generateRandomPoint(std::vector<double> &random_point);
 
-    inline void calculateVolume()
-    {
-        for (size_t i = 0; i < dimension; ++i)
-            volume *= edge;
-    }
+    void calculateVolume();
 
-    inline size_t getDimension() const { return dimension; }
+    uint getDimension() const { return dimension; }
 
-    inline double getVolume() const { return volume; }
+    double getVolume() const { return volume; }
 
 protected: 
     double edge;
-    size_t dimension;
+    uint dimension;
     double volume;
     std::random_device rd;
     std::default_random_engine eng;

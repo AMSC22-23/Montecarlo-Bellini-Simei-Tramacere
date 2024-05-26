@@ -11,31 +11,26 @@
 #include "functionevaluator.hpp"
 #include "asset.hpp"
 
-class HyperRectangle: public Geometry
+
+class HyperRectangle : public Geometry
 {
-public: 
-    explicit HyperRectangle(size_t dim, std::vector<double> &hyper_rectangle_bounds);
+public:
+    explicit HyperRectangle(int dim, std::vector<double> &hyper_rectangle_bounds);
 
     void generateRandomPoint(std::vector<double> &random_point);
 
-    void financeGenerateRandomPoint(std::vector<double> &random_point, const std::vector<const Asset *> &assetPtrs, const double std_dev_from_mean);
+    void financeGenerateRandomPoint(std::vector<double> &random_point, const std::vector<const Asset*>& assetPtrs, double std_dev_from_mean);
+    
+    void calculateVolume();
 
-    inline void calculateVolume()
-    {
-        for (size_t i = 0; i < 2 * dimension - 1; i += 2)
-        {
-            volume *= (hyper_rectangle_bounds[i + 1] - hyper_rectangle_bounds[i]);
-        }
-    }
+    int getDimension() const { return dimension; }
 
-    inline size_t getDimension() const { return dimension; }
+    double getVolume() const { return volume; }
 
-    inline double getVolume() const { return volume; }
-
-protected: 
+protected:
     std::vector<double> hyper_rectangle_bounds;
     double volume;
-    size_t dimension;
+    int dimension;
     std::random_device rd;
     std::default_random_engine eng;
 };

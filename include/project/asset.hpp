@@ -32,7 +32,7 @@ public:
 
 private: 
     std::string name;
-    double return_mean    = 0.0;
+    double return_mean    = 0.0;  // Initialize to 0.0 by default
     double closing_price  = 0.0;
     double return_std_dev = 0.0;
     double expected_price = 0.0;

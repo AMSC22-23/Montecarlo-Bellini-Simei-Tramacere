@@ -3,13 +3,12 @@
 std::pair<std::string, std::vector<double>> createPayoffFunction(double k, const std::vector<Asset> &assets)
 {
     std::vector<double> coefficients;
-    coefficients.reserve(assets.size());
     std::pair<std::string, std::vector<double>> result;
     std::string function = "max(0, (";
 
     for (size_t i = 0; i < assets.size(); ++i)
     {
-        coefficients.emplace_back(assets[i].getLastRealValue());
+        coefficients.push_back(assets[i].getLastRealValue());
         function += "x" + std::to_string(i + 1) + " * " + std::to_string(coefficients[i]);
         if (i < assets.size() - 1)
         {

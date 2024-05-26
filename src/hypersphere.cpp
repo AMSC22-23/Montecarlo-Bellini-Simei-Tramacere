@@ -1,13 +1,14 @@
 #include <omp.h>
 #include "../include/project/hypersphere.hpp"
 
-HyperSphere::HyperSphere(size_t dim, double rad) : radius(rad), parameter(dim / 2.0), volume(0.0), dimension(dim) {}
+constexpr double PI = 3.14159265358979323846;
+
+HyperSphere::HyperSphere(int dim, double rad) : radius(rad), parameter(dim / 2.0), volume(0.0), dimension(dim) {}
+
 
 void HyperSphere::generateRandomPoint(std::vector<double> &random_point)
 {
-    std::vector<double> local_random_point;
-    local_random_point.resize(dimension);
-
+    std::vector<double> local_random_point(dimension);
     double local_sum_of_squares = 0.0;
     omp_set_num_threads(random_point.size());
 
@@ -33,4 +34,9 @@ void HyperSphere::generateRandomPoint(std::vector<double> &random_point)
     {
         random_point[0] = 0.0;
     }
+}
+
+void HyperSphere::calculateVolume()
+{
+    volume = std::pow(PI, parameter) / std::tgamma(parameter + 1.0) * std::pow(radius, dimension);
 }

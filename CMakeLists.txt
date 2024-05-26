@@ -9,7 +9,7 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-option(DEBUG_MODE "Enable Debug Mode" OFF)
+#option(DEBUG_MODE "Enable Debug Mode" OFF)
 
 if(DEBUG_MODE)
     set(CMAKE_BUILD_TYPE "Debug")
@@ -20,8 +20,7 @@ endif()
 message(STATUS)
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS)
-# add_definitions(-DNO_AFFINITY=1)
-# add_compile_options(-DNO_AFFINITY=1)
+
 SET(CMAKE_CXX_FLAGS"-Ofast -Wall -mavx2 -flto -lpthread -march=znver2 -mtune=znver2 -qopt-zmm-usage=high -qopt-prefetch -qopt-dynamic-align")
 
 IF (MY_COMPILER_OPTION STREQUAL "Intel")
@@ -38,6 +37,24 @@ else()
     add_compile_options(-O3 -Wall -march=native)
 endif()
 
+# Check if CUDA is available and add CUDA source files
+find_package(CUDA)
+if(CUDA_FOUND)
+        message(STATUS "CUDA found")
+
+        # Enable CUDA language
+        enable_language(CUDA) #enable NVCC compiler
+
+        # Set policy to use CUDA_ARCHITECTURES
+        cmake_policy(SET CMP0104 NEW)
+
+        # Set CUDA_ARCHITECTURES to compute capability 6.1
+        set(CMAKE_CUDA_ARCHITECTURES 61 62 70 72 75 80 86)
+endif()
+
+add_subdirectory(CUDA)
+
+
 include_directories(/include/muparser-2.3.4/include)
 
 # Library files
@@ -49,10 +66,10 @@ add_library(OptionPricing STATIC
     src/hypersphere.cpp
     utils/inputmanager.cpp
     src/montecarlo.cpp
-    utils/financeinputmanager.cpp
-    src/financemontecarlo.cpp
+    utils/finance_inputmanager.cpp
+    src/finance_montecarlo.cpp
     src/optionparameters.cpp
-    utils/financecomputation.cpp
+    utils/finance_computation.cpp
     utils/integrationcomputation.cpp
 )
 

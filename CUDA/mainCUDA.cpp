@@ -4,11 +4,11 @@
 #include <iomanip>
 #include "../include/project/hyperrectangle.hpp"
 #include "../include/project/asset.hpp"
-#include "../include/project/financecomputation.hpp"
+#include "../include/project/finance_computation.hpp"
 #include "../include/project/asset.hpp"
-#include "../include/project/financemontecarlo.hpp"
+#include "../include/project/finance_montecarlo.hpp"
 #include "../include/project/optionparameters.hpp"
-#include "../include/project/financeinputmanager.hpp"
+#include "../include/project/finance_inputmanager.hpp"
 
 extern std::pair<double, double> kernel_wrapper(long long int N, const std::string &function, HyperRectangle &hyperrectangle,
                                                 const std::vector<const Asset *> &assetPtrs /* = std::vector<const Asset*>() */,
@@ -21,16 +21,16 @@ int main(int argc, char **argv)
 
   using namespace std::chrono;
 
-  // long long int N = 4194304;
-  // long long int N = 1e8;
+  
   long long int N = 1e7;
   double strike_price = 0.0;
   int std_dev_from_mean = 24;
   double variance = 0.0;
+  uint num_iterations = 10;
 
   // Load the assets from the csv file
   std::vector<Asset> assets;
-  int csv_result = loadAssets("../data/", assets);
+  int csv_result = loadAssets("../../data/", assets);
   if (csv_result == -1)
   {
     std::cout << "Error loading the assets from the CSV files" << std::endl;
@@ -67,7 +67,7 @@ int main(int argc, char **argv)
   result.first = 0.0;
   result.second = 0.0;
 
-  size_t num_iterations = 100;
+  
   for (size_t i = 0; i < num_iterations; ++i)
   {
     std::mt19937 eng(std::random_device{}());
@@ -78,7 +78,6 @@ int main(int argc, char **argv)
                                  coefficients, strike_price, seed);
     result.first += result_temp.first;
     result.second += result_temp.second;
-    variance = 0.0;
   }
   result.first /= num_iterations;
 

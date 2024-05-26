@@ -3,14 +3,24 @@
 
 This is the project for the Advanced Methods for Scientific Computing course @ Politecnico di Milano. Objective of this project is to compute the approximation of an integral over a domain in n dimensions using a MonteCarlo Algorithm.
 
-### To compile and run
+### To compile
 
 ```bash
 mkdir build
 cd build
 cmake ..
 make
+```
+### To run the CPU only version:
+```bash
 ./mainOmp
+```
+
+### If you have CUDA installed it will be detected and you can run the Option Pricing application exploiting the power of your NVIDIA GPU
+
+```bash
+cd CUDA
+./mainCuda
 ```
 
 ### What to expect
