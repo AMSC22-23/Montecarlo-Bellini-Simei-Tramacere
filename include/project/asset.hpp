@@ -29,13 +29,11 @@ public:
      * @param closing_price Last real value of the asset
      * @param return_std_dev Standard deviation of the return of the asset
      * @param expected_price Expected price of the asset
-     * @param time_taken Time taken to compute the expected price
      */
     Asset(const std::string &name, double return_mean, double closing_price,
           double return_std_dev, double expected_price, double time_taken)
         :  name(name), return_mean(return_mean), closing_price(closing_price),
-          return_std_dev(return_std_dev), expected_price(expected_price),
-          time_taken(time_taken) {}
+          return_std_dev(return_std_dev), expected_price(expected_price) {}
 
     /**
      * @brief Get the return mean of the asset 
@@ -114,7 +112,6 @@ private:
     double closing_price  = 0.0;
     double return_std_dev = 0.0;
     double expected_price = 0.0;
-    double time_taken     = 0.0;
 };
 
 
