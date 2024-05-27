@@ -2,9 +2,12 @@
 
 #include "../include/project/hypersphere.hpp"
 
+
+// Constructor
 HyperSphere::HyperSphere(size_t dim, double rad) : radius(rad), parameter(dim / 2.0), volume(0.0), dimension(dim) {}
 
-
+// Function to generate a random point in the hypersphere domain
+// for the Monte Carlo method of the original project
 void HyperSphere::generateRandomPoint(std::vector<double> &random_point)
 {
     std::vector<double> local_random_point;

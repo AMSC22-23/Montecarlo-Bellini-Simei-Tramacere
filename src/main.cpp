@@ -22,6 +22,8 @@
 #include "../include/project/finance_computation.hpp"
 #include "../include/project/integrationcomputation.hpp"
 
+
+// Main function
 int main()
 {
     int choice;
@@ -36,8 +38,10 @@ int main()
 
         if (std::cin.fail())
         {
-            std::cin.clear ();                                                   // Clear the fail state
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Clear the input buffer
+            // Clear the fail state
+            std::cin.clear ();
+            // Clear the input buffer                                                 
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             std::cout << "Invalid input. Please enter a number." << std::endl;
         }
         else
