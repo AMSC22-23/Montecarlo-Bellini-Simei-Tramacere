@@ -1,6 +1,7 @@
 #include <cuda_runtime.h>
 #include <curand_kernel.h>
 
+
 extern "C++"
 {
 #include "../include/project/hyperrectangle.hpp"
@@ -23,13 +24,13 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
 }
 
 
-__global__ void generateGaussianNumbers( float *total_value, float *total_squared_value,
+__global__ void generateGaussianNumbers( float *total_payoff, float *total_squared_value,
                                         const float *assets_returns, const float *assets_std_devs, long long int n,
                                         float *assets_closing_values, int strike_price, long long int seed, float *predicted_assets_prices )
 {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
     // TODO 4 is the maximum number of assets
-    float result = 0.0;
+    float payoff_function = 0.0;
     float rnd_daily_return = 0.0;
     float closing_value;
 
@@ -46,18 +47,19 @@ __global__ void generateGaussianNumbers( float *total_value, float *total_square
             rnd_daily_return = assets_returns[asset_idx] + assets_std_devs[asset_idx] * return_value;
             closing_value = closing_value * (1 + rnd_daily_return);
 
-            result += closing_value;
+            payoff_function += closing_value;
             atomicAdd(&predicted_assets_prices[asset_idx], closing_value);
+            atomicAdd(&total_squared_value[asset_idx], closing_value);
         }
-
-        if (result > strike_price)
-            {
-                result = result - strike_price;
-            }else result = 0.0;
-
-        atomicAdd(&total_value[tid % 100000], result);
-        atomicAdd(&total_squared_value[tid % 100000], result * result);
-    }
+        if (payoff_function > strike_price)
+            payoff_function -= strike_price;            
+        else payoff_function = 0.0;
+        //atomicAdd(total_payoff, payoff_function);
+        atomicAdd(&total_payoff[0], payoff_function);
+        //*total_payoff += payoff_function;
+        //printf("total payoff: %f\n", *total_payoff);
+        //printf("total payoff2: %f\n", total_payoff2);
+    }    
 }
 
 
@@ -97,9 +99,7 @@ extern std::pair<double, double> kernel_wrapper(long long int n, const std::stri
     
 
     // Call the CUDA kernel to print the function and coefficients
-    // printf("Calling CUDA kernel!\n");
      printFunction<<<1, 1>>>(n, d_function, d_coefficients, coefficients.size());
-    // printf("CUDA kernel finished!\n");
 
     // Save the assets main data
     float *d_assets_returns;
@@ -121,52 +121,45 @@ extern std::pair<double, double> kernel_wrapper(long long int n, const std::stri
         gpuErrchk( cudaMemcpy(&d_assets_last_values[i], &last_value, sizeof(float), cudaMemcpyHostToDevice) );
     }
 
-    
-    double total_value = 0.0;
-    double total_squared_value = 0.0;
 
-    float *d_total_value, *d_total_squared_value;
-    gpuErrchk( cudaMalloc(&d_total_value, 100000 * sizeof(float)) );
-    gpuErrchk( cudaMalloc(&d_total_squared_value, 100000 * sizeof(float)) );
+    float *d_total_squared_value, *d_total_payoff;
+    gpuErrchk( cudaMalloc(&d_total_squared_value, num_assets * sizeof(float)) );
+    gpuErrchk( cudaMalloc(&d_total_payoff, 1 * sizeof(float)) );
 
     float predicted_assets_prices[num_assets];;
     float *d_predicted_assets_prices;
     gpuErrchk( cudaMalloc(&d_predicted_assets_prices, num_assets * sizeof(float)) );
 
-    generateGaussianNumbers<<<number_of_blocks, threads_per_block>>>( d_total_value, d_total_squared_value, d_assets_returns, d_assets_std_devs, n, d_assets_last_values, strike_price, seed, d_predicted_assets_prices);
+    generateGaussianNumbers<<<number_of_blocks, threads_per_block>>>( d_total_payoff, d_total_squared_value, d_assets_returns, d_assets_std_devs, n, d_assets_last_values, strike_price, seed, d_predicted_assets_prices);
     cudaDeviceSynchronize();
 
-    float host_total_value[100000];
-    float host_total_squared_value[100000];
-    gpuErrchk( cudaMemcpy(host_total_value, d_total_value, 100000 * sizeof(float), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(host_total_squared_value, d_total_squared_value, 100000 * sizeof(float), cudaMemcpyDeviceToHost) );
+    float host_total_squared_value[num_assets];
+    gpuErrchk( cudaMemcpy(host_total_squared_value, d_total_squared_value, num_assets * sizeof(float), cudaMemcpyDeviceToHost) );
 
-    for (size_t i = 0; i <  100000; i++)
-    {
-        total_value += static_cast<double>( host_total_value[i] );
-        total_squared_value += static_cast<double>( host_total_squared_value[i] );
-    }
-
-
+    
     float host_assets_prices[num_assets];
     gpuErrchk( cudaMemcpy(host_assets_prices, d_predicted_assets_prices, num_assets * sizeof(float), cudaMemcpyDeviceToHost) );
 
-    for( size_t i = 0; i < num_assets; ++i )
+    float total_payoff[1];
+    gpuErrchk( cudaMemcpy(&total_payoff, d_total_payoff, 1 * sizeof(float), cudaMemcpyDeviceToHost) );
+
+    float total_squared_value = 0.0;
+
+    for (size_t i = 0; i <  num_assets; i++)
     {
+        total_squared_value += ( host_total_squared_value[i] );
         predicted_assets_prices[i] = ( host_assets_prices[i]/n );
         std::cout << "The predicted future price (30 days) of one " << assetPtrs[i]->getName() << " stock is " << predicted_assets_prices[i] << std::endl;
     }
 
-
-    double option_payoff = total_value / n;
+    float option_payoff = total_payoff[0] / n;
 
     // calculate the variance
-    *variance = total_squared_value/n - (total_value / n) * (total_value/ n);
-    *variance = sqrt(*variance / static_cast<double>(n));
+    *variance = total_squared_value/n - (total_payoff[0] / n) * (total_payoff[0]/ n);
+    *variance = sqrt(*variance / n);
 
 
     // Free the device memory
-    gpuErrchk( cudaFree(d_total_value) );
     gpuErrchk( cudaFree(d_total_squared_value) );
     gpuErrchk( cudaFree(d_function) );
     gpuErrchk( cudaFree(d_coefficients) );
@@ -174,11 +167,12 @@ extern std::pair<double, double> kernel_wrapper(long long int n, const std::stri
     gpuErrchk( cudaFree(d_assets_std_devs) );
     gpuErrchk( cudaFree(d_assets_last_values) );
     gpuErrchk( cudaFree(d_predicted_assets_prices) );
-    // cudaFree(d_simulated_returns);
+    gpuErrchk( cudaFree(d_total_payoff) );
 
     printf("--------->option payoff: %f\n", option_payoff);
+    printf("strike price: %f\n", strike_price);
     auto end = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start); // return std::make_pair(69.0, 420.0);
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
     cudaDeviceSynchronize();
 
     return std::make_pair(option_payoff, static_cast<double>(duration.count()));

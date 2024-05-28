@@ -36,4 +36,8 @@ std::pair<double, double> montecarloPricePrediction(size_t points,
                                                     std::vector<double> &predicted_assets_prices);
 
 
+void generateRandomPoint(std::vector<double> &random_point,
+                                                const std::vector<const Asset *> &assetPtrs,
+                                                const double std_dev_from_mean);
+
 #endif

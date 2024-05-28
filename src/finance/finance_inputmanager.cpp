@@ -6,7 +6,7 @@
 #include <sstream>
 #include <filesystem>
 
-#include "../include/project/finance_inputmanager.hpp"
+#include "../../include/project/finance_inputmanager.hpp"
 
 int getIntegrationBounds(std::vector<double> &integration_bounds,
                          const std::vector<Asset> &assets,

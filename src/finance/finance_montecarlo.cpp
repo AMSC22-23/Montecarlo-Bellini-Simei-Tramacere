@@ -1,4 +1,4 @@
-#include "../include/project/finance_montecarlo.hpp"
+#include "../../include/project/finance_montecarlo.hpp"
 
 
 // Function to calculate the option price prediction using the Monte Carlo method
@@ -33,7 +33,7 @@ std::pair<double, double> montecarloPricePrediction(size_t points,
         for (size_t i = 0; i < points; ++i)
         {
 
-            hyperrectangle.financeGenerateRandomPoint(random_point_vector, assetPtrs, std_dev_from_mean);
+            generateRandomPoint(random_point_vector, assetPtrs, std_dev_from_mean);
             
             // Check if the random point vector is not null
             if (random_point_vector[0] != 0.0)
@@ -77,4 +77,35 @@ std::pair<double, double> montecarloPricePrediction(size_t points,
     auto end      = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
     return std::make_pair(option_payoff, static_cast<double>(duration.count()));
+}
+
+
+// Function to generate a random point in the hyperrectangle domain
+// for the finance oriented project
+void generateRandomPoint(std::vector<double> &random_point,
+                                                const std::vector<const Asset *> &assetPtrs,
+                                                const double std_dev_from_mean)
+{
+    try
+    {
+        thread_local std::mt19937 eng(std::random_device{}());
+
+#pragma omp parallel for 
+        for (size_t i = 0; i < assetPtrs.size(); ++i)
+        {
+            std::normal_distribution<double> distribution(assetPtrs[i]->getReturnMean(), assetPtrs[i]->getReturnStdDev());
+            double price = assetPtrs[i]->getLastRealValue();
+                price = price * (1 + distribution(eng));
+            double predicted_return = price / assetPtrs[i]->getLastRealValue();
+#pragma omp critical
+                {
+                    random_point[i] = predicted_return;
+                }
+        }
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Error occurred: " << e.what() << std::endl;
+        random_point.clear();
+    }
 }

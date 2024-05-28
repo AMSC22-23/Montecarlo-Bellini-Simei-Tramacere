@@ -9,10 +9,10 @@ if(CUDA_FOUND)
     # Add the CUDA library
     add_library(CudaOptionPricing STATIC
     ../src/hyperrectangle.cpp
-    ../utils/finance_inputmanager.cpp
-    ../src/finance_montecarlo.cpp
-    ../src/optionparameters.cpp
-    ../utils/finance_computation.cpp
+    ../src/finance/finance_inputmanager.cpp
+    ../src/finance/finance_montecarlo.cpp
+    ../src/finance/optionparameters.cpp
+    ../src/finance/optionpricer.cpp
     optionpricer.cu
 )
     add_executable(mainCUDA

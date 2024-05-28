@@ -18,32 +18,3 @@ void HyperRectangle::generateRandomPoint(std::vector<double> &random_point)
     }
 }
 
-// Function to generate a random point in the hyperrectangle domain
-// for the finance oriented project
-void HyperRectangle::financeGenerateRandomPoint(std::vector<double> &random_point,
-                                                const std::vector<const Asset *> &assetPtrs,
-                                                const double std_dev_from_mean)
-{
-    try
-    {
-        thread_local std::mt19937 eng(std::random_device{}());
-
-#pragma omp parallel for 
-        for (size_t i = 0; i < assetPtrs.size(); ++i)
-        {
-            std::normal_distribution<double> distribution(assetPtrs[i]->getReturnMean(), assetPtrs[i]->getReturnStdDev());
-            double price = assetPtrs[i]->getLastRealValue();
-                price = price * (1 + distribution(eng));
-            double predicted_return = price / assetPtrs[i]->getLastRealValue();
-#pragma omp critical
-                {
-                    random_point[i] = predicted_return;
-                }
-        }
-    }
-    catch (const std::exception &e)
-    {
-        std::cerr << "Error occurred: " << e.what() << std::endl;
-        random_point.clear();
-    }
-}

@@ -4,11 +4,11 @@
 #include <chrono>
 #include <ctime>
 
-#include "../include/project/finance_computation.hpp"
-#include "../include/project/asset.hpp"
-#include "../include/project/finance_montecarlo.hpp"
-#include "../include/project/optionparameters.hpp"
-#include "../include/project/finance_inputmanager.hpp"
+#include "../../include/project/finance_computation.hpp"
+#include "../../include/project/asset.hpp"
+#include "../../include/project/finance_montecarlo.hpp"
+#include "../../include/project/optionparameters.hpp"
+#include "../../include/project/finance_inputmanager.hpp"
 
 
 // Function that embeds multiple methods that are used to compute 

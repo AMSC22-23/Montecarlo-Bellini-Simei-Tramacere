@@ -66,11 +66,11 @@ add_library(OptionPricing STATIC
     src/hypersphere.cpp
     utils/inputmanager.cpp
     src/montecarlo.cpp
-    utils/finance_inputmanager.cpp
-    src/finance_montecarlo.cpp
-    src/optionparameters.cpp
-    utils/finance_computation.cpp
-    utils/integrationcomputation.cpp
+    src/finance/finance_inputmanager.cpp
+    src/finance/finance_montecarlo.cpp
+    src/finance/optionparameters.cpp
+    src/finance/optionpricer.cpp
+    src/integralcalculator.cpp
 )
 
 add_executable(mainOmp

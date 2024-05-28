@@ -39,19 +39,6 @@ public:
      */
     void generateRandomPoint(std::vector<double> &random_point);
 
-    /**
-     * @brief Generate a random point inside the hyperrectangle
-     * @details The function generates a random point inside the hyperrectangle domain
-     * in a parallel fashion using OpenMP following a uniform distribution.
-     * @param random_point A vector of doubles representing the random point
-     * @param assetPtrs A vector of pointers to Asset objects
-     * @param std_dev_from_mean A double representing the standard deviation from the mean
-     * 
-     * This function is used to generate random points for the finance project.
-     */
-    void financeGenerateRandomPoint(std::vector<double> &random_point,
-                                    const std::vector<const Asset *> &assetPtrs,
-                                    const double std_dev_from_mean);
 
     /**
      * @brief Calculate the volume of the hyperrectangle
