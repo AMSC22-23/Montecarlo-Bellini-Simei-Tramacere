@@ -28,8 +28,7 @@ __global__ void generateGaussianNumbers( float *total_value, float *total_square
                                         float *assets_closing_values, int strike_price, long long int seed, float *predicted_assets_prices )
 {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
-    float simulated_returns[4]; // TODO 4 is the maximum number of assets
-    //size_t num_assets = sizeof(simulated_returns);
+    // TODO 4 is the maximum number of assets
     float result = 0.0;
     float rnd_daily_return = 0.0;
     float closing_value;
@@ -47,24 +46,8 @@ __global__ void generateGaussianNumbers( float *total_value, float *total_square
             rnd_daily_return = assets_returns[asset_idx] + assets_std_devs[asset_idx] * return_value;
             closing_value = closing_value * (1 + rnd_daily_return);
 
-            simulated_returns[asset_idx] = closing_value/assets_closing_values[asset_idx];
-
-            // if (simulated_returns[asset_idx] < assets_returns[asset_idx] - 24 * assets_std_devs[asset_idx] + 1.0){
-            //     //printf("Simulated return out of bounds: %f < %f\n", simulated_returns[asset_idx], assets_returns[asset_idx] - 24 * assets_std_devs[asset_idx] + 1.0);
-            //     asset_idx--;                
-            //     continue;
-
-            // } else if(simulated_returns[asset_idx] > assets_returns[asset_idx] + 24 * assets_std_devs[asset_idx] + 1.0 ){
-            //     //printf("Simulated return out of bounds: %f > %f\n", simulated_returns[asset_idx], assets_returns[asset_idx] + 24 * assets_std_devs[asset_idx] + 1.0);
-            //     asset_idx--;                
-            //     continue;
-            // }
-            // else {
-                result += closing_value;
-                atomicAdd(&predicted_assets_prices[asset_idx], closing_value);
-                //printf("OK        Simulated return: %f, asset_idx: %d\n", simulated_returns[asset_idx], asset_idx);
-            //  }            
-            
+            result += closing_value;
+            atomicAdd(&predicted_assets_prices[asset_idx], closing_value);
         }
 
         if (result > strike_price)
@@ -83,10 +66,10 @@ __global__ void generateGaussianNumbers( float *total_value, float *total_square
 __global__ void printFunction(long long int n, char *function, const double *coefficients, int number_of_coefficients)
 {
     printf("Function: %s\n", function);
-    printf("n: %d\n", n);
+    printf("n: %ld\n", n);
     for (size_t i = 0; i < number_of_coefficients; ++i)
     {
-        printf("Coefficient[%d]: %f\n", i, coefficients[i]);
+        printf("Coefficient[%ld]: %f\n", i, coefficients[i]);
     }
     printf("Number of coefficients: %d\n", number_of_coefficients);
 }
@@ -153,18 +136,6 @@ extern std::pair<double, double> kernel_wrapper(long long int n, const std::stri
     generateGaussianNumbers<<<number_of_blocks, threads_per_block>>>( d_total_value, d_total_squared_value, d_assets_returns, d_assets_std_devs, n, d_assets_last_values, strike_price, seed, d_predicted_assets_prices);
     cudaDeviceSynchronize();
 
-    double domain = 1.0;
-    double integration_bounds[num_assets * 2 - 1];
-    int j = 0;
-
-        for (size_t i = 0; i < num_assets * 2 - 1; i += 2)
-        {
-            integration_bounds[i]     = assetPtrs[j]->getReturnMean() - 24 * assetPtrs[j]->getReturnStdDev() + 1.0;
-            integration_bounds[i + 1] = assetPtrs[j]->getReturnMean() + 24 * assetPtrs[j]->getReturnStdDev() + 1.0;
-            j++;
-            domain *= (integration_bounds[i + 1] - integration_bounds[i]);
-        }
-
     float host_total_value[100000];
     float host_total_squared_value[100000];
     gpuErrchk( cudaMemcpy(host_total_value, d_total_value, 100000 * sizeof(float), cudaMemcpyDeviceToHost) );
@@ -183,11 +154,11 @@ extern std::pair<double, double> kernel_wrapper(long long int n, const std::stri
     for( size_t i = 0; i < num_assets; ++i )
     {
         predicted_assets_prices[i] = ( host_assets_prices[i]/n );
-        std::cout << "The predicted future prices (30 days) of one " << assetPtrs[i]->getName() << " stock is " << predicted_assets_prices[i] << std::endl;
+        std::cout << "The predicted future price (30 days) of one " << assetPtrs[i]->getName() << " stock is " << predicted_assets_prices[i] << std::endl;
     }
 
 
-    double integral = total_value / n * domain;
+    double option_payoff = total_value / n;
 
     // calculate the variance
     *variance = total_squared_value/n - (total_value / n) * (total_value/ n);
@@ -202,12 +173,13 @@ extern std::pair<double, double> kernel_wrapper(long long int n, const std::stri
     gpuErrchk( cudaFree(d_assets_returns) );
     gpuErrchk( cudaFree(d_assets_std_devs) );
     gpuErrchk( cudaFree(d_assets_last_values) );
+    gpuErrchk( cudaFree(d_predicted_assets_prices) );
     // cudaFree(d_simulated_returns);
 
-    printf("--------->Integral: %f\n", integral);
+    printf("--------->option payoff: %f\n", option_payoff);
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start); // return std::make_pair(69.0, 420.0);
     cudaDeviceSynchronize();
 
-    return std::make_pair(integral, static_cast<double>(duration.count()));
+    return std::make_pair(option_payoff, static_cast<double>(duration.count()));
 }

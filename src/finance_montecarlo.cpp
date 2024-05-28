@@ -68,9 +68,7 @@ std::pair<double, double> montecarloPricePrediction(size_t points,
     }
 
     // Calculate the integral
-    hyperrectangle.calculateVolume();
-    double domain   = hyperrectangle.getVolume();
-    double integral = total_value / static_cast<double>(points) * domain;
+    double option_payoff = total_value / static_cast<double>(points);
 
     // Calculate the variance
     variance = total_squared_value / static_cast<double>(points) - (total_value / static_cast<double>(points)) * (total_value / static_cast<double>(points));
@@ -78,5 +76,5 @@ std::pair<double, double> montecarloPricePrediction(size_t points,
     // Stop the timer
     auto end      = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-    return std::make_pair(integral, static_cast<double>(duration.count()));
+    return std::make_pair(option_payoff, static_cast<double>(duration.count()));
 }

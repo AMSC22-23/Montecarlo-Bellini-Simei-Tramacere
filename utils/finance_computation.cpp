@@ -36,8 +36,8 @@ void financeComputation()
 
     std::cout << "The assets have been loaded successfully." << std::endl;
 
-    size_t num_iterations         = 10;
-    size_t iterations             = 1e5;
+    size_t num_iterations         = 5;
+    size_t iterations             = 1e6;
     double strike_price           = calculateStrikePrice(assets);
     const  uint std_dev_from_mean = 24;
     double variance               = 0.0;
@@ -71,6 +71,10 @@ void financeComputation()
 
     HyperRectangle hyperrectangle(assets.size(), integration_bounds);
 
+    for( size_t i = 0; i< assets.size(); i++)
+    {
+        std::cout << "mean and variance of " << assets[i].getName() << " is " << assets[i].getReturnMean() << " and " << assets[i].getReturnStdDev() << std::endl;
+    }
     std::cout << "Calculating the price of the option..." << std::endl;
 
     // Apply the Monte Carlo method to calculate the price of the option
@@ -89,7 +93,7 @@ void financeComputation()
         result.first   += result_temp.first;
         result.second  += result_temp.second;
         variance       += variance_temp;
-        standard_error += std::sqrt(variance_temp / static_cast<double>(iterations)) * hyperrectangle.getVolume();
+        standard_error += std::sqrt(variance_temp / static_cast<double>(iterations));
 
         double progress = static_cast<double>(j + 1) / static_cast<double>(num_iterations) * 100;
         std::cout << "Process at " << progress << "% ...\n";
@@ -143,33 +147,18 @@ void financeComputation()
         outputFile << "==================================================================================================================================\n";
         outputFile << "The function is: " << function << "\n"
                    << std::endl;
-        outputFile << "The integration bounds are: " << "\n";
-        for (size_t i = 0; i < integration_bounds.size(); i += 2)
-        {
-            outputFile << "[" << integration_bounds[i] << ", " << integration_bounds[i + 1] << "]\n";
-        }
         outputFile << "==================================================================================================================================\n";
         outputFile << std::left << std::setw(22) << "Points";
         outputFile << std::left << std::setw(22) << "Error";
-        outputFile << std::left << std::setw(22) << "Variance";
-        outputFile << std::left << std::setw(22) << "E[option payoff]";
-        outputFile << std::left << std::setw(22) << "95% conf. interval";
+        outputFile << std::left << std::setw(22) << "Option payoff";
         outputFile << std::left << std::setw(22) << "Time[s]" << "\n";
     }
 
-    // Calculate the confidence interval, 
-    // with a critical value of 1.96 for a 95% confidence interval
-    double critical_value = 1.96;
-    double margin_of_error = critical_value * standard_error;
-    double lower_bound     = result.first - margin_of_error;
-    double upper_bound     = result.first + margin_of_error;
 
     // Write the results to output.txt
     outputFile << std::left << std::setw(22) << iterations;
     outputFile << std::fixed << std::setprecision(6) << std::left << std::setw(22) << standard_error;
-    outputFile << std::fixed << std::setprecision(6) << std::left << std::setw(22) << variance;
     outputFile << std::fixed << std::setprecision(6) << std::left << std::setw(22) << result.first;
-    outputFile << std::fixed << std::setprecision(6) << std::left << "[" << lower_bound << ", " << upper_bound << std::setw(3) << "]";
     outputFile << std::fixed << std::setprecision(6) << std::left << std::setw(22) << result.second * 1e-6 << "\n";
     outputFile.close();
     std::cout << "\nThe integral has been calculated successfully " << num_iterations << " times for " << iterations << " points." << std::endl;

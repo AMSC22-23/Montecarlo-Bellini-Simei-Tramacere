@@ -9,7 +9,7 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-#option(DEBUG_MODE "Enable Debug Mode" OFF)
+option(DEBUG_MODE "Enable Debug Mode" OFF)
 
 if(DEBUG_MODE)
     set(CMAKE_BUILD_TYPE "Debug")
@@ -37,7 +37,7 @@ else()
     add_compile_options(-O3 -Wall -march=native)
 endif()
 
-# Check if CUDA is available and add CUDA source files
+#sCheck if CUDA is available and add CUDA source files
 find_package(CUDA)
 if(CUDA_FOUND)
         message(STATUS "CUDA found")

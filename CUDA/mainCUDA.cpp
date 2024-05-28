@@ -21,12 +21,12 @@ int main(int argc, char **argv)
 
   using namespace std::chrono;
 
-  
-  long long int N = 1e7;
+  // long long int N = 4194304;
+  // long long int N = 1e8;
+  long long int N = 1e6;
   double strike_price = 0.0;
   int std_dev_from_mean = 24;
   double variance = 0.0;
-  uint num_iterations = 10;
 
   // Load the assets from the csv file
   std::vector<Asset> assets;
@@ -67,7 +67,7 @@ int main(int argc, char **argv)
   result.first = 0.0;
   result.second = 0.0;
 
-  
+  size_t num_iterations = 50;
   for (size_t i = 0; i < num_iterations; ++i)
   {
     std::mt19937 eng(std::random_device{}());
@@ -80,6 +80,7 @@ int main(int argc, char **argv)
     result.second += result_temp.second;
   }
   result.first /= num_iterations;
+  variance /= num_iterations;
 
   // Open the output file stream
   std::ofstream outputFile("output.txt", std::ios::app);

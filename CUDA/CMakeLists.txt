@@ -2,18 +2,11 @@
 file(GLOB_RECURSE SOURCES "maincuda.cpp")
 
 if(CUDA_FOUND)
-    # Locate CUDA source files
-    # file(GLOB_RECURSE CUDA_SOURCES "optionpricer.cu")
-
-    # Append CUDA source files to the list of sources
-    # list(APPEND SOURCES ${CUDA_SOURCES})
-
+    
     # Enable CUDA language
     enable_language(CUDA)
 
-    # Create a shared library from the source files
-    # add_library(CUDA_LIBRARY SHARED ${SOURCES})
-
+    # Add the CUDA library
     add_library(CudaOptionPricing STATIC
     ../src/hyperrectangle.cpp
     ../utils/finance_inputmanager.cpp
@@ -22,7 +15,6 @@ if(CUDA_FOUND)
     ../utils/finance_computation.cpp
     optionpricer.cu
 )
-
     add_executable(mainCUDA
     mainCUDA.cpp
     ${HEADER_FILES}
@@ -33,9 +25,13 @@ if(CUDA_FOUND)
     target_include_directories(CudaOptionPricing PRIVATE include)
     target_include_directories(mainCUDA PRIVATE include)
 
-    # Link the CUDA library and necessary libraries to the mainCUDA executable
-    # target_link_directories(CUDA_LIBRARY PUBLIC "${CudaOptionPricing}/lib")
-
     # Link CUDA libraries to the CUDA_LIBRARY
-    target_link_libraries(mainCUDA PUBLIC CudaOptionPricing )
+    #target_link_libraries(mainCUDA PUBLIC CudaOptionPricing )
+
+    find_package(OpenMP REQUIRED)
+    if(OpenMP_CXX_FOUND)
+        set(OPENMP_FLAGS "-fopenmp -Wopenmp-simd")
+        target_link_libraries(CudaOptionPricing OpenMP::OpenMP_CXX ${OPENMP_FLAGS} )
+        target_link_libraries(mainCUDA PUBLIC CudaOptionPricing OpenMP::OpenMP_CXX ${OPENMP_FLAGS} )
+    endif()
 endif()

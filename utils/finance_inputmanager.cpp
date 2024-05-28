@@ -85,6 +85,7 @@ int extrapolateCsvData(const std::string &filename,
     double squared_deviation       = 0.0;
     double return_std_dev          = 0.0;
     double closing_price           = 0.0;
+    double opening_price           = 0.0;
     std::vector<double> daily_returns;
 
       // Process each line of the file
@@ -107,6 +108,7 @@ int extrapolateCsvData(const std::string &filename,
 
           // Extract and store the close price
         std::getline(ss, temp_close, ',');
+        opening_price = std::stod(temp_open);
         closing_price = std::stod(temp_close);
         daily_returns.emplace_back((std::stod(temp_close) - std::stod(temp_open)) / std::stod(temp_open));
         total_return_percentage += daily_returns[counter];
@@ -131,8 +133,9 @@ int extrapolateCsvData(const std::string &filename,
     {
         asset_ptr->setReturnMean(return_mean_percentage);
         asset_ptr->setReturnStdDev(return_std_dev);
-        asset_ptr->setLastRealValue(closing_price);
+        asset_ptr->setLastRealValue(opening_price);
     }
       // Return success
+    printf("closing price of the stock is %f\n", closing_price);  
     return 0;
 }

@@ -15,7 +15,7 @@ void HyperCube::generateRandomPoint(std::vector<double>& random_point)
 {
     std::uniform_real_distribution<double> distribution(-edge / 2, edge / 2);
 
-#pragma omp parallel for
+#pragma omp parallel for 
     for (size_t i = 0; i < random_point.size(); ++i)
         random_point[i] = distribution(eng);
 }
