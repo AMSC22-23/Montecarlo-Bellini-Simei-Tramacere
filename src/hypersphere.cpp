@@ -14,11 +14,13 @@ void HyperSphere::generateRandomPoint(std::vector<double> &random_point)
     local_random_point.resize(dimension);
 
     double local_sum_of_squares = 0.0;
+    // Fix the number of threads to the number of random points
     omp_set_num_threads(random_point.size());
 
 #pragma omp parallel
     {
         int thread_id = omp_get_thread_num();
+        // Generate random points by following the uniform distribution
         thread_local std::default_random_engine eng(rd() + thread_id);
         std::uniform_real_distribution<double> distribution(-radius, radius);
 

@@ -46,17 +46,23 @@ int main()
         }
         else
         {
+            // Let the user choose the computation type:
+            // 1. Finance Monte Carlo
+            // 2. Monte Carlo Integration over a chosen domain
             switch (choice)
             {
             case 1: 
+                // Execute the finance oriented computation
                 financeComputation();
                 validChoice = true;
                 break;
             case 2: 
+                // Execute the original project computation
                 integrationComputation();
                 validChoice = true;
                 break;
             default: 
+                // Invalid choice
                 std::cout << "Invalid choice. Please enter 1 or 2." << std::endl;
                 break;
             }

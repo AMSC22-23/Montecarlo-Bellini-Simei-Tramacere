@@ -1,6 +1,8 @@
 #include "../include/project/functionevaluator.hpp"
 #include <chrono>
 
+
+// Function to evaluate the function using the muParser library
 double evaluateFunction(const std::string &expression, const std::vector<double> &point, mu::Parser &parser)
 {
     for (size_t i = 0; i < point.size(); ++i)
@@ -19,6 +21,7 @@ double evaluateFunction(const std::string &expression, const std::vector<double>
     catch (mu::Parser::exception_type &e)
     {
         std::cout << "Error evaluating expression: " << e.GetMsg() << std::endl;
-        return 0.0; // Return some default value in case of an error
+        // Return some default value in case of an error
+        return 0.0;
     }
 }

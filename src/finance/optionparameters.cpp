@@ -13,6 +13,7 @@ std::pair<std::string, std::vector<double>> createPayoffFunction(double k, const
 
     for (size_t i = 0; i < assets.size(); ++i)
     {
+        // Populate the coefficients vector with the last real value of each asset
         coefficients.emplace_back(assets[i].getLastRealValue());
         function += "x" + std::to_string(i + 1) + " * " + std::to_string(coefficients[i]);
         if (i < assets.size() - 1)

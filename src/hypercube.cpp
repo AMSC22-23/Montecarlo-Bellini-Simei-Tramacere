@@ -13,6 +13,7 @@ HyperCube::HyperCube(size_t dim, double edge)
 // This function is used in the Monte Carlo method of the original project
 void HyperCube::generateRandomPoint(std::vector<double>& random_point)
 {
+    // Generate random points by following the uniform distribution
     std::uniform_real_distribution<double> distribution(-edge / 2, edge / 2);
 
 #pragma omp parallel for 

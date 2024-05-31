@@ -5,6 +5,15 @@
 
 #include "../include/project/inputmanager.hpp"
 
+
+// Function to read input from the user
+// This function is required in the original project and it reads the following inputs
+// necessary for the Monte Carlo integration:
+// - The type of domain to integrate
+// - The number of random points to generate
+// - The dimension of the domain
+// - The function to integrate
+// - Various parameters depending on the domain type
 void buildIntegral(size_t &n,
                    size_t &dim,
                    double &rad,
@@ -13,6 +22,7 @@ void buildIntegral(size_t &n,
                    std::string &domain_type,
                    std::vector<double> &hyper_rectangle_bounds)
 {
+    // Read the domain type choice from the user
     std::cout << "Insert the type of domain you want to integrate:\n";
     std::cout << "  hc  - hyper-cube\n";
     std::cout << "  hs  - hyper-sphere\n";
@@ -24,6 +34,7 @@ void buildIntegral(size_t &n,
         readInput(std::cin, domain_type);
     }
 
+    // Read the number of random points to generate
     std::cout << "Insert the number of random points to generate:\n";
     std::string input_n;
     readInput(std::cin, input_n);
@@ -33,8 +44,11 @@ void buildIntegral(size_t &n,
         readInput(std::cin, input_n);
     }
 
+    // Ask some parameters specific to the hypersphere domain
+    // if the user chose to integrate over a hypersphere
     if (domain_type == "hs")
     {
+        // Read the dimension of the hypersphere
         std::cout << "Insert the dimension of the hypersphere:\n";
         std::string input_dim;
         readInput(std::cin, input_dim);
@@ -44,6 +58,7 @@ void buildIntegral(size_t &n,
             readInput(std::cin, input_dim);
         }
 
+        // Read the radius of the hypersphere
         std::cout << "Insert the radius of the hypersphere:\n";
         std::string input_rad;
         readInput(std::cin, input_rad);
@@ -53,8 +68,12 @@ void buildIntegral(size_t &n,
             readInput(std::cin, input_rad);
         }
     }
+
+    // Ask some parameters specific to the hyperrectangle domain
+    // if the user chose to integrate over a hyperrectangle
     else if (domain_type == "hr")
     {
+        // Read the dimension of the hyperrectangle
         std::cout << "Insert the dimension of the hyperrectangle:\n";
         std::string input_dim;
         readInput(std::cin, input_dim);
@@ -72,7 +91,7 @@ void buildIntegral(size_t &n,
             std::string boundType         = (i % 2 == 0) ? "lower" : "upper";
             std::string suffix;
 
-              // Determine the ordinal suffix
+            // Determine the ordinal suffix
             if (current_dimension % 10 == 1 && current_dimension % 100 != 11)
             {
                 suffix = "st";
@@ -121,8 +140,12 @@ void buildIntegral(size_t &n,
             hyper_rectangle_bounds.emplace_back(tmp);
         }
     }
+
+    // Ask some parameters specific to the hypercube domain
+    // if the user chose to integrate over a hypercube
     else if (domain_type == "hc")
     {
+        // Read the dimension of the hypercube
         std::cout << "Insert the dimension of the hypercube:\n";
         std::string input_dim;
         readInput(std::cin, input_dim);
@@ -132,6 +155,7 @@ void buildIntegral(size_t &n,
             readInput(std::cin, input_dim);
         }
 
+        // Read the edge length of the hypercube
         std::cout << "Insert the edge length of the hypercube:\n";
         std::string input_edge;
         readInput(std::cin, input_edge);
@@ -141,6 +165,8 @@ void buildIntegral(size_t &n,
             readInput(std::cin, input_edge);
         }
     }
+
+    // Read the function to integrate
     std::cout << "Insert the function to integrate:\n";
     readInput(std::cin, function);
 }
