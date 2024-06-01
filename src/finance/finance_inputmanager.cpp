@@ -8,8 +8,11 @@
 
 #include "../../include/project/finance_inputmanager.hpp"
 
-  // Function to get the integration bounds for the Monte Carlo method
-  // of the finance oriented project
+// Function to calculate log returns
+double logReturn(double price, double prevPrice) {
+    return std::log(price / prevPrice);
+}
+
 int getIntegrationBounds(std::vector<double> &integration_bounds,
                          const std::vector<Asset> &assets,
                          const int std_dev_from_mean /* = 24 */)
@@ -17,8 +20,6 @@ int getIntegrationBounds(std::vector<double> &integration_bounds,
     try
     {
         size_t j = 0;
-
-          // Iterate over the assets and populate the integration bounds
         for (size_t i = 0; i < assets.size() * 2 - 1; i += 2)
         {
             integration_bounds[i]     = assets[j].getReturnMean() - std_dev_from_mean * assets[j].getReturnStdDev() + 1.0;
@@ -33,8 +34,6 @@ int getIntegrationBounds(std::vector<double> &integration_bounds,
     return 0;
 }
 
-  // Function to load the assets from the CSV files in the directory and
-  // populate the vector of assets
 int loadAssets(const std::string &directory,
                std::vector<Asset> &assets)
 {
@@ -73,11 +72,9 @@ int loadAssets(const std::string &directory,
     return 0;
 }
 
-  // Function to extrapolate the data from the CSV file and populate the Asset object
 int extrapolateCsvData(const std::string &filename,
                        Asset *asset_ptr)
 {
-      // Open the file
     std::ifstream file(filename);
     if (!file.is_open())
     {
@@ -90,10 +87,8 @@ int extrapolateCsvData(const std::string &filename,
 
     double total_return_percentage = 0.0;
     size_t counter                 = 0;
-    double squared_deviation       = 0.0;
-    double return_std_dev          = 0.0;
+    double std_dev          = 0.0;
     double closing_price           = 0.0;
-    double opening_price           = 0.0;
     std::vector<double> daily_returns;
 
       // Process each line of the file
@@ -116,9 +111,9 @@ int extrapolateCsvData(const std::string &filename,
 
           // Extract and store the close price
         std::getline(ss, temp_close, ',');
-        opening_price = std::stod(temp_open);
         closing_price = std::stod(temp_close);
-        daily_returns.emplace_back((std::stod(temp_close) - std::stod(temp_open)) / std::stod(temp_open));
+        // daily_returns.emplace_back((std::stod(temp_close) - std::stod(temp_open)) / std::stod(temp_open));
+        daily_returns.emplace_back(logReturn(std::stod(temp_close), std::stod(temp_open)));
         total_return_percentage += daily_returns[counter];
         counter++;
     }
@@ -132,18 +127,18 @@ int extrapolateCsvData(const std::string &filename,
       // Calculate variance
     for (size_t i = 0; i < counter; i++)
     {
-        squared_deviation += (daily_returns[i] - return_mean_percentage) * (daily_returns[i] - return_mean_percentage);
+        std_dev += (daily_returns[i] - return_mean_percentage) * (daily_returns[i] - return_mean_percentage) / static_cast<double>(counter);
     }
-    return_std_dev = std::sqrt(squared_deviation / static_cast<double>(counter));
+    std_dev = std::sqrt(std_dev);
 
       // Update the Asset object with the accumulated values
     if (asset_ptr)
     {
         asset_ptr->setReturnMean(return_mean_percentage);
-        asset_ptr->setReturnStdDev(return_std_dev);
-        asset_ptr->setLastRealValue(opening_price);
+        asset_ptr->setReturnStdDev(std_dev);
+        asset_ptr->setLastRealValue(closing_price);
     }
-
-    printf("closing price of the stock is %f\n", closing_price);
+      // Return success
+    printf("closing price of the stock is %f\n", closing_price);  
     return 0;
 }
