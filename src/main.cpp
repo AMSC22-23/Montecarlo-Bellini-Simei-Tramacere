@@ -20,10 +20,9 @@
 #include "../include/project/optionparameters.hpp"
 #include "../include/project/functionevaluator.hpp"
 #include "../include/project/finance_computation.hpp"
-#include "../include/project/integrationcomputation.hpp"
+#include "../include/project/integralcalculator.hpp"
 
-
-// Main function
+  // Main function
 int main()
 {
     int choice;
@@ -31,6 +30,7 @@ int main()
 
     while (!validChoice)
     {
+        // Display the menu
         std::cout << "Choose computation type:" << std::endl;
         std::cout << "1. Finance Monte Carlo" << std::endl;
         std::cout << "2. Monte Carlo Integration" << std::endl;
@@ -38,31 +38,28 @@ int main()
 
         if (std::cin.fail())
         {
-            // Clear the fail state
-            std::cin.clear ();
-            // Clear the input buffer                                                 
+              // Clear the fail state
+            std::cin.clear();
+              // Clear the input buffer
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             std::cout << "Invalid input. Please enter a number." << std::endl;
         }
         else
         {
-            // Let the user choose the computation type:
-            // 1. Finance Monte Carlo
-            // 2. Monte Carlo Integration over a chosen domain
+            // Check the choice
             switch (choice)
             {
             case 1: 
-                // Execute the finance oriented computation
+                // Call the finance computation function
                 financeComputation();
                 validChoice = true;
                 break;
             case 2: 
-                // Execute the original project computation
-                integrationComputation();
+                // Call the integral calculator function
+                integralCalculator();
                 validChoice = true;
                 break;
             default: 
-                // Invalid choice
                 std::cout << "Invalid choice. Please enter 1 or 2." << std::endl;
                 break;
             }

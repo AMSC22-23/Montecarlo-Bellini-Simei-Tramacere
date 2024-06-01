@@ -10,14 +10,13 @@
 #include "../../include/project/optionparameters.hpp"
 #include "../../include/project/finance_inputmanager.hpp"
 
-
-// Function that embeds multiple methods that are used to compute 
-// the option price using the Monte Carlo method
+  // Function that embeds multiple methods that are used to compute
+  // the option price using the Monte Carlo method
 void financeComputation()
 {
     std::vector<Asset> assets;
 
-    // Load the assets from the CSV files
+      // Load the assets from the CSV files
     std::cout << "Loading assets from csv..." << std::endl;
 
     int csv_result = loadAssets("../data/", assets);
@@ -48,9 +47,9 @@ void financeComputation()
     result.first  = 0.0;
     result.second = 0.0;
 
-    // Create the payoff function.
-    // The payoff function describes the financial beahviour of the option,
-    // and it is required to calculate the price of the option.
+      // Create the payoff function.
+      // The payoff function describes the financial beahviour of the option,
+      // and it is required to calculate the price of the option.
     auto function_pair = createPayoffFunction(strike_price, assets);
     auto function      = function_pair.first;
     auto coefficients  = function_pair.second;
@@ -60,9 +59,9 @@ void financeComputation()
     std::vector<double> integration_bounds;
     integration_bounds.resize(assets.size() * 2);
 
-    // Set the integration bounds based on the assets, on which the domain of the hyperrectangle is based.
-    // The integration bounds are required in order to apply the Monte Carlo method for the option pricing,
-    // and they are calculated based on the standard deviation from the mean of the assets.
+      // Set the integration bounds based on the assets, on which the domain of the hyperrectangle is based.
+      // The integration bounds are required in order to apply the Monte Carlo method for the option pricing,
+      // and they are calculated based on the standard deviation from the mean of the assets.
     if (getIntegrationBounds(integration_bounds, assets, std_dev_from_mean) == -1)
     {
         std::cout << "Error setting the integration bounds" << std::endl;
@@ -71,13 +70,13 @@ void financeComputation()
 
     HyperRectangle hyperrectangle(assets.size(), integration_bounds);
 
-    for( size_t i = 0; i< assets.size(); i++)
+    for (size_t i = 0; i < assets.size(); i++)
     {
         std::cout << "mean and variance of " << assets[i].getName() << " is " << assets[i].getReturnMean() << " and " << assets[i].getReturnStdDev() << std::endl;
     }
     std::cout << "Calculating the price of the option..." << std::endl;
 
-    // Apply the Monte Carlo method to calculate the price of the option
+      // Apply the Monte Carlo method to calculate the price of the option
     for (size_t j = 0; j < num_iterations; ++j)
     {
         result_temp = montecarloPricePrediction(iterations,
@@ -115,24 +114,24 @@ void financeComputation()
 
     if (isEmpty)
     {
-        // Get current time and date
+          // Get current time and date
         auto        now  = std::chrono::system_clock::now();
         std::time_t time = std::chrono::system_clock::to_time_t(now);
 
-        // Convert time to string
+          // Convert time to string
         std::string timeStr = std::ctime(&time);
         timeStr.pop_back();  // Remove the newline character at the end
 
-        // Parse the date and time string
+          // Parse the date and time string
         std::istringstream ss(timeStr);
         std::string dayOfWeek, month, day, timeOfDay, year;
         ss >> dayOfWeek >> month >> day >> timeOfDay >> year;
 
-        // Reformat the string to have the year before the time
+          // Reformat the string to have the year before the time
         std::ostringstream formattedTimeStr;
         formattedTimeStr << dayOfWeek << " " << month << " " << day << " " << year << " " << timeOfDay;
 
-        // Write the results to output.txt
+          // Write the results to output.txt
         outputFile << "Generated on: " << formattedTimeStr.str() << "\n";
         outputFile << "==================================================================================================================================\n";
         outputFile << std::left << std::setw(22) << "Asset";
@@ -154,8 +153,7 @@ void financeComputation()
         outputFile << std::left << std::setw(22) << "Time[s]" << "\n";
     }
 
-
-    // Write the results to output.txt
+      // Write the results to output.txt
     outputFile << std::left << std::setw(22) << iterations;
     outputFile << std::fixed << std::setprecision(6) << std::left << std::setw(22) << standard_error;
     outputFile << std::fixed << std::setprecision(6) << std::left << std::setw(22) << result.first;

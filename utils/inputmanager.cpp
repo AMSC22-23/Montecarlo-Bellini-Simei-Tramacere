@@ -5,15 +5,7 @@
 
 #include "../include/project/inputmanager.hpp"
 
-
-// Function to read input from the user
-// This function is required in the original project and it reads the following inputs
-// necessary for the Monte Carlo integration:
-// - The type of domain to integrate
-// - The number of random points to generate
-// - The dimension of the domain
-// - The function to integrate
-// - Various parameters depending on the domain type
+// Function to read input from the console
 void buildIntegral(size_t &n,
                    size_t &dim,
                    double &rad,
@@ -22,7 +14,7 @@ void buildIntegral(size_t &n,
                    std::string &domain_type,
                    std::vector<double> &hyper_rectangle_bounds)
 {
-    // Read the domain type choice from the user
+    // Read the input parameters
     std::cout << "Insert the type of domain you want to integrate:\n";
     std::cout << "  hc  - hyper-cube\n";
     std::cout << "  hs  - hyper-sphere\n";
@@ -44,11 +36,9 @@ void buildIntegral(size_t &n,
         readInput(std::cin, input_n);
     }
 
-    // Ask some parameters specific to the hypersphere domain
-    // if the user chose to integrate over a hypersphere
+    // If the domain is a hypersphere, read the dimension and radius
     if (domain_type == "hs")
     {
-        // Read the dimension of the hypersphere
         std::cout << "Insert the dimension of the hypersphere:\n";
         std::string input_dim;
         readInput(std::cin, input_dim);
@@ -58,7 +48,6 @@ void buildIntegral(size_t &n,
             readInput(std::cin, input_dim);
         }
 
-        // Read the radius of the hypersphere
         std::cout << "Insert the radius of the hypersphere:\n";
         std::string input_rad;
         readInput(std::cin, input_rad);
@@ -68,12 +57,9 @@ void buildIntegral(size_t &n,
             readInput(std::cin, input_rad);
         }
     }
-
-    // Ask some parameters specific to the hyperrectangle domain
-    // if the user chose to integrate over a hyperrectangle
+    // If the domain is a hyperrectangle, read the dimension and bounds
     else if (domain_type == "hr")
     {
-        // Read the dimension of the hyperrectangle
         std::cout << "Insert the dimension of the hyperrectangle:\n";
         std::string input_dim;
         readInput(std::cin, input_dim);
@@ -83,6 +69,7 @@ void buildIntegral(size_t &n,
             readInput(std::cin, input_dim);
         }
 
+        // Read the bounds of the hyperrectangle
         hyper_rectangle_bounds.reserve(dim * 2);
         for (size_t i = 0; i < 2 * dim; i++)
         {
@@ -91,7 +78,7 @@ void buildIntegral(size_t &n,
             std::string boundType         = (i % 2 == 0) ? "lower" : "upper";
             std::string suffix;
 
-            // Determine the ordinal suffix
+              // Determine the ordinal suffix
             if (current_dimension % 10 == 1 && current_dimension % 100 != 11)
             {
                 suffix = "st";
@@ -109,6 +96,7 @@ void buildIntegral(size_t &n,
                 suffix = "th";
             }
 
+            // Handle the case where the upper bound is less than the lower bound
             while (true)
             {
                 std::cout << "Insert the " << boundType << " bound of the " << current_dimension
@@ -140,12 +128,9 @@ void buildIntegral(size_t &n,
             hyper_rectangle_bounds.emplace_back(tmp);
         }
     }
-
-    // Ask some parameters specific to the hypercube domain
-    // if the user chose to integrate over a hypercube
+    // If the domain is a hypercube, read the dimension and edge length
     else if (domain_type == "hc")
     {
-        // Read the dimension of the hypercube
         std::cout << "Insert the dimension of the hypercube:\n";
         std::string input_dim;
         readInput(std::cin, input_dim);
@@ -155,7 +140,6 @@ void buildIntegral(size_t &n,
             readInput(std::cin, input_dim);
         }
 
-        // Read the edge length of the hypercube
         std::cout << "Insert the edge length of the hypercube:\n";
         std::string input_edge;
         readInput(std::cin, input_edge);
@@ -165,8 +149,6 @@ void buildIntegral(size_t &n,
             readInput(std::cin, input_edge);
         }
     }
-
-    // Read the function to integrate
     std::cout << "Insert the function to integrate:\n";
     readInput(std::cin, function);
 }

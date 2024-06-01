@@ -65,7 +65,6 @@ add_library(OptionPricing STATIC
     src/hyperrectangle.cpp
     src/hypersphere.cpp
     utils/inputmanager.cpp
-    src/montecarlo.cpp
     src/finance/finance_inputmanager.cpp
     src/finance/finance_montecarlo.cpp
     src/finance/optionparameters.cpp

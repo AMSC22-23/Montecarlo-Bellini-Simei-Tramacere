@@ -7,8 +7,7 @@
 
 #include "../muparser-2.3.4/include/muParser.h"
 
-
-/**
+  /**
  * @brief This function is used to evaluate a function
  * @details The function evaluates a function using the muParser library
  * @param expression The expression of the function
@@ -17,6 +16,5 @@
  * @return The value of the function
  */
 double evaluateFunction(const std::string &expression, const std::vector<double> &point, mu::Parser &parser);
-
 
 #endif

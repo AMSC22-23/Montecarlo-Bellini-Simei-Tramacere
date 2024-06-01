@@ -6,8 +6,7 @@
 
 #include "asset.hpp"
 
-
-/**
+  /**
  * @brief This function is used to get the integration bounds
  * for the Monte Carlo method
  * @details The function calculates the integration bounds
@@ -20,7 +19,7 @@
  */
 int getIntegrationBounds(std::vector<double> &integration_bounds, const std::vector<Asset> &assets, const int std_dev_from_mean = 24);
 
-/**
+  /**
  * @brief This function is used to extrapolate the data from a CSV file
  * @details The function reads the data from a CSV file and stores it in an Asset object
  * @param filename The name of the CSV file
@@ -29,7 +28,7 @@ int getIntegrationBounds(std::vector<double> &integration_bounds, const std::vec
  */
 int extrapolateCsvData(const std::string &filename, Asset *asset_ptr);
 
-/**
+  /**
  * @brief This function is used to load the assets from the CSV files
  * @details The function reads the data from the CSV files and stores it in a vector of Asset objects
  * @param directory The directory where the CSV files are stored
@@ -37,6 +36,5 @@ int extrapolateCsvData(const std::string &filename, Asset *asset_ptr);
  * @return 0 if the function has been executed successfully
  */
 int loadAssets(const std::string &directory, std::vector<Asset> &assets);
-
 
 #endif
