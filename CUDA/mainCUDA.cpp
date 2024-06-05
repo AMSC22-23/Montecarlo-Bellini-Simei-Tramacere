@@ -4,13 +4,12 @@
 #include <chrono>
 #include <fstream>
 #include <iomanip>
-#include "../include/project/hyperrectangle.hpp"
-#include "../include/project/asset.hpp"
-#include "../include/project/finance_computation.hpp"
-#include "../include/project/asset.hpp"
-#include "../include/project/finance_montecarlo.hpp"
-#include "../include/project/optionparameters.hpp"
-#include "../include/project/finance_inputmanager.hpp"
+#include "../include/integration/geometry/hyperrectangle.hpp"
+#include "../include/optionpricing/asset.hpp"
+#include "../include/optionpricing/optionpricer.hpp"
+#include "../include/optionpricing/finance_montecarlo.hpp"
+#include "../include/optionpricing/optionparameters.hpp"
+#include "../include/optionpricing/finance_inputmanager.hpp"
 
 extern std::pair<double, double> kernel_wrapper(long long int N, const std::string &function, HyperRectangle &hyperrectangle,
                                                 const std::vector<const Asset *> &assetPtrs /* = std::vector<const Asset*>() */,
@@ -19,11 +18,67 @@ extern std::pair<double, double> kernel_wrapper(long long int N, const std::stri
 // extern std::pair<double, double> kernel_wrapper();
 
 // Xorshift function
-uint32_t xorshift(uint32_t seed) {
+uint32_t xorshift(uint32_t seed)
+{
     seed ^= seed << 13;
     seed ^= seed >> 17;
     seed ^= seed << 5;
     return seed;
+}
+
+OptionType getOptionTypeFromUser()
+{
+    int input = 0;
+    OptionType option = OptionType::Invalid;
+
+    std::cout << "\nSelect the option type:\n1. European\n2. Asian\nEnter choice (1 or 2): ";
+
+    while (true)
+    {
+        std::cin >> input;
+
+        if (std::cin.fail() || (input != 1 && input != 2))
+        {
+            std::cin.clear();                                                   // Clear the error flag
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Discard invalid input
+            std::cout << "\nInvalid input. Please enter 1 for European or 2 for Asian." << std::endl;
+        }
+        else
+        {
+            option = static_cast<OptionType>(input);
+            break;
+        }
+    }
+
+    return option;
+}
+
+// Function to get user input for asset count type and validate
+AssetCountType getAssetCountTypeFromUser()
+{
+    int input = 0;
+    AssetCountType assetCountType = AssetCountType::Invalid;
+
+    std::cout << "\nSelect the asset count type:\n1. Single\n2. Multiple\nEnter choice (1 or 2): ";
+
+    while (true)
+    {
+        std::cin >> input;
+
+        if (std::cin.fail() || (input != 1 && input != 2))
+        {
+            std::cin.clear();                                                   // Clear the error flag
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Discard invalid input
+            std::cout << "\nInvalid input. Please enter 1 for Single or 2 for Multiple." << std::endl;
+        }
+        else
+        {
+            assetCountType = static_cast<AssetCountType>(input);
+            break;
+        }
+    }
+
+    return assetCountType;
 }
 
 int main(int argc, char **argv)
@@ -39,18 +94,47 @@ int main(int argc, char **argv)
     double variance = 0.0;
     size_t num_iterations = 5;
 
-    // Load the assets from the csv file
     std::vector<Asset> assets;
-    int csv_result = loadAssets("../../data/", assets);
-    if (csv_result == -1)
+
+    OptionType option_type = getOptionTypeFromUser();
+    if (option_type == OptionType::Invalid)
     {
-        std::cout << "Error loading the assets from the CSV files" << std::endl;
-        return -1;
+        std::cerr << "\nInvalid option type" << std::endl;
+        exit(1);
     }
+
+    AssetCountType asset_count_type = getAssetCountTypeFromUser();
+    if (asset_count_type == AssetCountType::Invalid)
+    {
+        std::cerr << "\nInvalid asset count type" << std::endl;
+        exit(1);
+    }
+
+    // Load the assets from the CSV files
+    std::cout << "\nLoading assets from csv..." << std::endl;
+
+    LoadAssetError load_result = loadAssets("../../data/", assets, asset_count_type);
+    switch (load_result)
+    {
+    case LoadAssetError::Success:
+        std::cout << "The assets have been loaded successfully.\n"
+                  << std::endl;
+        break;
+    case LoadAssetError::DirectoryOpenError:
+        exit(1);
+    case LoadAssetError::NoValidFiles:
+        std::cout << "No valid files found in the directory\n"
+                  << std::endl;
+        exit(1);
+    case LoadAssetError::FileReadError:
+        exit(1);
+    }
+
     std::vector<const Asset *> assetPtrs;
+    assetPtrs.reserve(assets.size());
     for (const auto &asset : assets)
     {
-        assetPtrs.push_back(&asset);
+        assetPtrs.emplace_back(&asset);
     }
 
     printf("Pricing the option ...\n");

@@ -10,17 +10,17 @@ double calculateCovariance(const Asset &asset1, const Asset &asset2, CovarianceE
     try
     {
           // Check if the sizes of daily returns match
-        if (asset1.getDailyReturns().size() != asset2.getDailyReturns().size())
+        if (asset1.getDailyReturnsSize() != asset2.getDailyReturnsSize())
         {
             error = CovarianceError::Failure;
             return covariance;
         }
 
           // Calculate covariance
-        size_t dataSize = asset1.getDailyReturns().size();
+        size_t dataSize = asset1.getDailyReturnsSize();
         for (size_t i = 0; i < dataSize; ++i)
         {
-            covariance += (asset1.getDailyReturns()[i] - mean1) * (asset2.getDailyReturns()[i] - mean2);
+            covariance += (asset1.getDailyReturn(i) - mean1) * (asset2.getDailyReturn(i) - mean2);
         }
         covariance /= (dataSize - 1);
         error       = CovarianceError::Success;

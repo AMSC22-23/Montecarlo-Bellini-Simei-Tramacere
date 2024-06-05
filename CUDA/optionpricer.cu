@@ -4,13 +4,12 @@
 
 extern "C++"
 {
-#include "../include/project/hyperrectangle.hpp"
-#include "../include/project/asset.hpp"
-#include "../include/project/finance_computation.hpp"
-#include "../include/project/asset.hpp"
-#include "../include/project/finance_montecarlo.hpp"
-#include "../include/project/optionparameters.hpp"
-#include "../include/project/finance_inputmanager.hpp"
+#include "../include/integration/geometry/hyperrectangle.hpp"
+#include "../include/optionpricing/asset.hpp"
+#include "../include/optionpricing/optionpricer.hpp"
+#include "../include/optionpricing/finance_montecarlo.hpp"
+#include "../include/optionpricing/optionparameters.hpp"
+#include "../include/optionpricing/finance_inputmanager.hpp"
 }
 
 #define gpuErrchk(ans)                        \
@@ -67,7 +66,10 @@ double phi(double x)
                   c        = e / (RT2PI * f);
         }
     }
-    return x < = 0.0 ? c : 1 - c;
+    if( x<=0.0)
+        return c;
+    else
+        return 1-c;
 }
 
 __global__ void generateGaussianNumbers(float *total_payoff, float *total_squared_value,

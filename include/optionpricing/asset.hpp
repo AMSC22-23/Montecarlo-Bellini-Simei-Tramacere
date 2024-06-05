@@ -76,13 +76,22 @@ public:
      */
     double getExpectedPrice() const { return expected_price; }
 
-      /**
+    
+    /**
      * @brief Get the daily returns of the asset
      * @return A vector of doubles representing the daily returns of the asset
      *
      * The daily returns are the returns of the asset for each day.
      */
-    std::vector<double> getDailyReturns() const { return daily_returns; }
+    size_t getDailyReturnsSize() const { return daily_returns.size(); }
+
+    /**
+     * @brief Get the daily returns of the asset
+     * @return A vector of doubles representing the daily returns of the asset
+     *
+     * The daily returns are the returns of the asset for each day.
+     */
+    double getDailyReturn(size_t i) const { return daily_returns[i]; }
 
       /**
      * @brief Set the return mean of the asset

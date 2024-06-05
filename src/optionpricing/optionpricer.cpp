@@ -188,14 +188,14 @@ void financeComputation()
     if (option_type == OptionType::Invalid)
     {
         std::cerr << "\nInvalid option type" << std::endl;
-        return;
+        exit(1);
     }
 
     AssetCountType asset_count_type = getAssetCountTypeFromUser();
     if (asset_count_type == AssetCountType::Invalid)
     {
         std::cerr << "\nInvalid asset count type" << std::endl;
-        return;
+        exit(1);
     }
 
       // Load the assets from the CSV files
@@ -208,12 +208,12 @@ void financeComputation()
         std::cout << "The assets have been loaded successfully.\n" << std::endl;
         break;
     case LoadAssetError::DirectoryOpenError: 
-        return;
+        exit(1);
     case LoadAssetError::NoValidFiles: 
         std::cout << "No valid files found in the directory\n" << std::endl;
-        return;
+        exit(1);
     case LoadAssetError::FileReadError: 
-        return;
+        exit(1);
     }
 
     std::vector<const Asset *> assetPtrs;
@@ -226,7 +226,7 @@ void financeComputation()
     size_t num_iterations         = 10;
     size_t num_simulations        = 1e5;
     double strike_price           = calculateStrikePrice(assets);
-    size_t months                 = assetPtrs[0]->getDailyReturns().size() / 21;
+    size_t months                 = assetPtrs[0]->getDailyReturnsSize() / 21;
     const  uint std_dev_from_mean = 24 * months;
     double variance               = 0.0;
     double variance_temp          = 0.0;
@@ -255,7 +255,7 @@ void financeComputation()
     if (getIntegrationBounds(integration_bounds, assets, std_dev_from_mean) == -1)
     {
         std::cout << "\nError setting the integration bounds" << std::endl;
-        return;
+        exit(1);
     }
 
     HyperRectangle hyperrectangle(assetPtrs.size(), integration_bounds);
@@ -285,7 +285,7 @@ void financeComputation()
         if (error != MonteCarloError::Success)
         {
             std::cerr << "Error in Monte Carlo simulation" << std::endl;
-            return;
+            exit(1);
         }
 
         result.first   += result_temp.first;
