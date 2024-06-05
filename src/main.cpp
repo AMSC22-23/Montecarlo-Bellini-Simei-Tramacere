@@ -6,21 +6,11 @@
 #include <iomanip>
 #include <fstream>
 
-#include "../include/muparser-2.3.4/include/muParser.h"
-#include "../include/muparser-2.3.4/include/muParserIncluder.h"
+#include "../external/muparser-2.3.4/include/muParser.h"
+#include "../external/muparser-2.3.4/include/muParserIncluder.h"
 
-#include "../include/project/inputmanager.hpp"
-#include "../include/project/hypersphere.hpp"
-#include "../include/project/hyperrectangle.hpp"
-#include "../include/project/hypercube.hpp"
-#include "../include/project/asset.hpp"
-#include "../include/project/montecarlo.hpp"
-#include "../include/project/finance_inputmanager.hpp"
-#include "../include/project/finance_montecarlo.hpp"
-#include "../include/project/optionparameters.hpp"
-#include "../include/project/functionevaluator.hpp"
-#include "../include/project/finance_computation.hpp"
-#include "../include/project/integralcalculator.hpp"
+#include "../include/integration/integralcalculator.hpp"
+#include "../include/optionpricing/optionpricer.hpp"
 
   // Main function
 int main()
@@ -30,7 +20,7 @@ int main()
 
     while (!validChoice)
     {
-        // Display the menu
+          // Display the menu
         std::cout << "Choose computation type:" << std::endl;
         std::cout << "1. Finance Monte Carlo" << std::endl;
         std::cout << "2. Monte Carlo Integration" << std::endl;
@@ -46,16 +36,16 @@ int main()
         }
         else
         {
-            // Check the choice
+              // Check the choice
             switch (choice)
             {
             case 1: 
-                // Call the finance computation function
+                  // Call the finance computation function
                 financeComputation();
                 validChoice = true;
                 break;
             case 2: 
-                // Call the integral calculator function
+                  // Call the integral calculator function
                 integralCalculator();
                 validChoice = true;
                 break;
