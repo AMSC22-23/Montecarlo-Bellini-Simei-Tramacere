@@ -53,7 +53,10 @@ void generateRandomPoint(std::vector<double> &random_point1,
                          const std::vector<const Asset *> &assetPtrs,
                          const double std_dev_from_mean,
                          std::vector<double> &predicted_assets_prices,
-                         const OptionType &option_type);
+                         const OptionType &option_type,
+                         const std::vector<std::vector<double>> &A,
+                         const std::vector<std::vector<double>> &zeta_matrix,
+                         const uint num_days_to_simulate);
 
   /**
  * @brief XOR shift random number generator.
@@ -70,7 +73,7 @@ uint32_t xorshift(uint32_t seed);
  * @param asset2 The second asset.
  * @return The covariance between the two assets.
  */
-double calculateCovariance(const Asset &asset1, const Asset &asset2);
+double calculateCovariance(const Asset &asset1, const Asset &asset2, CovarianceError &error);
 
   /**
  * @brief Calculate the covariance matrix for a set of assets.
@@ -78,7 +81,7 @@ double calculateCovariance(const Asset &asset1, const Asset &asset2);
  * @param assetPtrs Vector of pointers to the Asset objects.
  * @return The covariance matrix.
  */
-std::vector<std::vector<double>> calculateCovarianceMatrix(const std::vector<const Asset *> &assetPtrs);
+std::vector<std::vector<double>> calculateCovarianceMatrix(const std::vector<const Asset *> &assetPtrs, CovarianceError &error);
 
   /**
  * @brief Perform Cholesky factorization on a matrix.

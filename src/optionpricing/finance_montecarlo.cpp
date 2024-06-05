@@ -157,7 +157,30 @@ std::pair<double, double> monteCarloPricePrediction(size_t points,
     double result2             = 0.0;
     double r                   = 0.05;
     double T                   = 1.0;
+    uint   num_days_to_simulate = 252;
+
+      // Start the timer
     auto   start               = std::chrono::high_resolution_clock::now();
+    CovarianceError cov_error;
+    std::vector<std::vector<double>> covariance_matrix = calculateCovarianceMatrix(assetPtrs, cov_error);
+
+    if (cov_error != CovarianceError::Success)
+    {
+        std::cerr << "Error calculating the covariance matrix" << std::endl;
+        return std::make_pair(0.0, 0.0);
+    }
+
+    std::vector<std::vector<double>> A = choleskyFactorization(covariance_matrix, 1.0);
+
+    if (A.empty())
+    {
+        std::cerr << "Matrix is not positive-definite" << std::endl;
+        return std::make_pair(0.0, 0.0);
+    }
+
+    std::vector<std::vector<double>> zeta_matrix(num_days_to_simulate, std::vector<double>(assetPtrs.size(), 0.0));
+    fillZetaMatrix(zeta_matrix);
+
 
 #pragma omp parallel
     {
@@ -168,7 +191,7 @@ std::pair<double, double> monteCarloPricePrediction(size_t points,
         for (size_t i = 0; i < points / 2; ++i)
         {
 
-            generateRandomPoint(random_point_vector1, random_point_vector2, assetPtrs, std_dev_from_mean, predicted_assets_prices, option_type);
+            generateRandomPoint(random_point_vector1, random_point_vector2, assetPtrs, std_dev_from_mean, predicted_assets_prices, option_type, A, zeta_matrix, num_days_to_simulate);
 
               // Check if the random point vector is not empty
             if (random_point_vector1.size() != 0 && random_point_vector2.size() != 0)
@@ -223,37 +246,16 @@ void generateRandomPoint(std::vector<double> &random_point1,
                          const std::vector<const Asset *> &assetPtrs,
                          const double std_dev_from_mean,
                          std::vector<double> &predicted_assets_prices,
-                         const OptionType &option_type)
+                         const OptionType &option_type,
+                         const std::vector<std::vector<double>> &A,
+                         const std::vector<std::vector<double>> &zeta_matrix,
+                         const uint num_days_to_simulate)
 {
-    uint     num_days_to_simulate = 252;
     double   T                    = 1.0;
     double   r                    = 0.05;
     double   dt                   = T / num_days_to_simulate;
     uint32_t seed                 = 123456789;
-    CovarianceError error;
-    std::vector<std::vector<double>> covariance_matrix = calculateCovarianceMatrix(assetPtrs, error);
-
-    if (error != CovarianceError::Success)
-    {
-        std::cerr << "Error calculating the covariance matrix" << std::endl;
-        random_point1.clear();
-        random_point2.clear();
-        return;
-    }
-
-    std::vector<std::vector<double>> A = choleskyFactorization(covariance_matrix, 1.0);
-
-    if (A.empty())
-    {
-        std::cerr << "Matrix is not positive-definite" << std::endl;
-        random_point1.clear();
-        random_point2.clear();
-        return;
-    }
-
-    std::vector<std::vector<double>> zeta_matrix(num_days_to_simulate, std::vector<double>(assetPtrs.size(), 0.0));
-    fillZetaMatrix(zeta_matrix);
-
+    
     try
     {
         thread_local std::mt19937 eng(xorshift(seed));
