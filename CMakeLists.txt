@@ -70,6 +70,8 @@ add_library(OptionPricing STATIC
     src/optionpricing/finance_montecarlo.cpp
     src/optionpricing/optionparameters.cpp
     src/optionpricing/optionpricer.cpp
+    src/optionpricing/finance_montecarloutils.cpp
+    src/optionpricing/finance_pricingutils.cpp
     )
 
 add_executable(mainOmp

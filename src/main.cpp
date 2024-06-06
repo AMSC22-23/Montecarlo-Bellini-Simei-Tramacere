@@ -21,9 +21,9 @@ int main()
     while (!validChoice)
     {
           // Display the menu
-        std::cout << "Choose computation type:" << std::endl;
-        std::cout << "1. Finance Monte Carlo" << std::endl;
-        std::cout << "2. Monte Carlo Integration" << std::endl;
+        std::cout << "What you want to do?\n1. Price an option\n2. Calculate an integral\nEnter choice (1 or 2): ";
+
+
         std::cin >> choice;
 
         if (std::cin.fail())

@@ -6,7 +6,7 @@ double logReturn(const double price, const double previous_price)
 }
 
   // Function to calculate Hyperrectangle integration bounds
-int getIntegrationBounds(std::vector<double> &integration_bounds,
+int setIntegrationBounds(std::vector<double> &integration_bounds,
                          const std::vector<Asset> &assets,
                          const int std_dev_from_mean /* = 24 */)
 {

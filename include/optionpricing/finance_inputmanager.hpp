@@ -24,13 +24,14 @@ double logReturn(const double price, const double previous_price);
 
   /**
  * @brief Get the integration bounds for the Monte Carlo method.
- * @details This function calculates the integration bounds of the hyperrectangle domain for the Monte Carlo method using the standard deviation from the mean of the assets.
+ * @details This function calculates the integration bounds of the hyperrectangle domain
+ *          for the Monte Carlo method using the standard deviation from the mean of the assets.
  * @param integration_bounds The vector that will contain the integration bounds.
  * @param assets The vector of assets.
  * @param std_dev_from_mean The standard deviation from the mean.
  * @return 0 if the function has been executed successfully.
  */
-int getIntegrationBounds(std::vector<double> &integration_bounds, const std::vector<Asset> &assets, const int std_dev_from_mean = 24);
+int setIntegrationBounds(std::vector<double> &integration_bounds, const std::vector<Asset> &assets, const int std_dev_from_mean = 24);
 
   /**
  * @brief Extrapolate data from a CSV file.
@@ -43,7 +44,8 @@ int extrapolateCsvData(const std::string &filename, Asset *asset_ptr);
 
   /**
  * @brief Load assets from CSV files.
- * @details This function reads the data from CSV files in a specified directory and stores it in a vector of Asset objects.
+ * @details This function reads the data from CSV files in a specified directory
+ *          and stores it in a vector of Asset objects.
  * @param directory The directory where the CSV files are stored.
  * @param assets The vector that will contain the Asset objects.
  * @return A LoadAssetError value that indicates the status of the function.
