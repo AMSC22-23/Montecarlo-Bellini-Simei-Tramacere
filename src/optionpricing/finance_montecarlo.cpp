@@ -57,6 +57,10 @@ std::pair<double, double> monteCarloPricePrediction(size_t points,
 #pragma omp parallel
     {
           // Random point vectors
+        double total_value_thread1 = 0.0;
+        double total_value_thread2 = 0.0;
+        double total_squared_value_thread1 = 0.0;
+        double total_squared_value_thread2 = 0.0;
         std::vector<double> random_point_vector1(assetPtrs.size(), 0.0);
         std::vector<double> random_point_vector2(assetPtrs.size(), 0.0);
 
@@ -83,15 +87,22 @@ std::pair<double, double> monteCarloPricePrediction(size_t points,
                 result1 = std::max(0.0, (result1 - strike_price));
                 result2 = std::max(0.0, (result2 - strike_price));
 
-                total_value         += result1 + result2;
-                total_squared_value += result1 * result1 +
-                                       result2 * result2;
+                total_value_thread1 += result1;
+                total_value_thread2 += result2;
+                total_squared_value_thread1 += result1 * result1;
+                total_squared_value_thread2 += result2 * result2;
             }
             else
             {
                 error = MonteCarloError::PointGenerationFailed;
                 i     = points / 2;
             }
+        }
+
+#pragma omp critical
+        {
+            total_value += total_value_thread1 + total_value_thread2;
+            total_squared_value += total_squared_value_thread1 + total_squared_value_thread2;
         }
     }
 
@@ -132,7 +143,6 @@ void generateRandomPoint(std::vector<double> &random_point1,
     {
         thread_local std::mt19937 eng(xorshift(seed));
 
-#pragma omp parallel for
         for (size_t i = 0; i < assetPtrs.size(); ++i)
         {
               // Geometry Brownian Motion price:
@@ -175,20 +185,21 @@ void generateRandomPoint(std::vector<double> &random_point1,
                     asian_prices2 += prices2[step];
                 }
             }
+              // Calculate the random point
+              if (option_type == OptionType::Asian)
+              {
+                  random_point1[i] = asian_prices1 / num_days_to_simulate;
+                  random_point2[i] = asian_prices2 / num_days_to_simulate;
+              }
+              else if (option_type == OptionType::European)
+              {
+                  random_point1[i] = prices1[num_days_to_simulate];
+                  random_point2[i] = prices2[num_days_to_simulate];
+              }
 
 #pragma omp critical
             {
-                  // Calculate the random point
-                if (option_type == OptionType::Asian)
-                {
-                    random_point1[i] = asian_prices1 / num_days_to_simulate;
-                    random_point2[i] = asian_prices2 / num_days_to_simulate;
-                }
-                else if (option_type == OptionType::European)
-                {
-                    random_point1[i] = prices1[num_days_to_simulate];
-                    random_point2[i] = prices2[num_days_to_simulate];
-                }
+                
                   // Calculate the predicted asset prices
                 predicted_assets_prices[i] += prices1[num_days_to_simulate] + prices2[num_days_to_simulate];
             }
