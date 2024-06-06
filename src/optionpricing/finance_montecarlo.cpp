@@ -164,7 +164,7 @@ void generateRandomPoint(std::vector<double> &random_point1,
                                                             dt -
                                                         sqrt(dt) *
                                                             num);
-                if (option_type == OptionType::Asian && step % 21 == 0)
+                if (option_type == OptionType::Asian )
                 {
                     asian_prices1 += prices1[step];
                     asian_prices2 += prices2[step];
@@ -175,8 +175,8 @@ void generateRandomPoint(std::vector<double> &random_point1,
             {
                 if (option_type == OptionType::Asian)
                 {
-                    random_point1[i] = asian_prices1 / 12.0;
-                    random_point2[i] = asian_prices2 / 12.0;
+                    random_point1[i] = asian_prices1 / num_days_to_simulate;
+                    random_point2[i] = asian_prices2 / num_days_to_simulate;
                 }
                 else if (option_type == OptionType::European)
                 {
