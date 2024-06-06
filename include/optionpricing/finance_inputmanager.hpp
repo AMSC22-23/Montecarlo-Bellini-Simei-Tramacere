@@ -1,3 +1,9 @@
+/**
+ * @file finance_inputmanager.hpp
+ * @brief This file contains the declarations of functions related to input management for the pricing of an option.
+ 
+ */
+
 #ifndef PROJECT_FINANCEINPUTMANAGER_
     #define PROJECT_FINANCEINPUTMANAGER_
 
@@ -21,17 +27,6 @@
  * @return The log return.
  */
 double logReturn(const double price, const double previous_price);
-
-  /**
- * @brief Get the integration bounds for the Monte Carlo method.
- * @details This function calculates the integration bounds of the hyperrectangle domain
- *          for the Monte Carlo method using the standard deviation from the mean of the assets.
- * @param integration_bounds The vector that will contain the integration bounds.
- * @param assets The vector of assets.
- * @param std_dev_from_mean The standard deviation from the mean.
- * @return 0 if the function has been executed successfully.
- */
-int setIntegrationBounds(std::vector<double> &integration_bounds, const std::vector<Asset> &assets, const int std_dev_from_mean = 24);
 
   /**
  * @brief Extrapolate data from a CSV file.

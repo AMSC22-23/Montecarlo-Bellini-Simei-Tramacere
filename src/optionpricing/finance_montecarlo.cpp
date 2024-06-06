@@ -1,16 +1,11 @@
 #include "../../include/optionpricing/finance_montecarlo.hpp"
 
-
   // Function to calculate the option price prediction using the Monte Carlo method
   // The function is the core of the finance oriented project, which is used to predict
   // the option price prediction using the Monte Carlo method.
 std::pair<double, double> monteCarloPricePrediction(size_t points,
-                                                    const std::string &function,
-                                                    HyperRectangle &hyperrectangle,
                                                     const std::vector<const Asset *> &assetPtrs,
-                                                    const double std_dev_from_mean,
                                                     double &variance,
-                                                    std::vector<double> coefficients,
                                                     const double strike_price,
                                                     std::vector<double> &predicted_assets_prices,
                                                     const OptionType &option_type,
@@ -32,18 +27,23 @@ std::pair<double, double> monteCarloPricePrediction(size_t points,
     }
 
       // Start the timer
-    auto   start               = std::chrono::high_resolution_clock::now();
+    auto start = std::chrono::high_resolution_clock::now();
+
+      // Calculate the covariance matrix
     CovarianceError cov_error;
     std::vector<std::vector<double>> covariance_matrix = calculateCovarianceMatrix(assetPtrs, cov_error);
 
+      // Check if the covariance matrix was calculated successfully
     if (cov_error != CovarianceError::Success)
     {
         std::cerr << "Error calculating the covariance matrix" << std::endl;
         return std::make_pair(0.0, 0.0);
     }
 
+      // Calculate the Cholesky factorization of the covariance matrix
     std::vector<std::vector<double>> A = choleskyFactorization(covariance_matrix, 1.0);
 
+      // Check if the matrix is positive-definite
     if (A.empty())
     {
         std::cerr << "Matrix is not positive-definite" << std::endl;
@@ -54,22 +54,22 @@ std::pair<double, double> monteCarloPricePrediction(size_t points,
     std::vector<std::vector<double>> zeta_matrix(num_days_to_simulate, std::vector<double>(assetPtrs.size(), 0.0));
     fillZetaMatrix(zeta_matrix);
 
-
 #pragma omp parallel
     {
+          // Random point vectors
         std::vector<double> random_point_vector1(assetPtrs.size(), 0.0);
         std::vector<double> random_point_vector2(assetPtrs.size(), 0.0);
 
 #pragma omp for reduction(+ : total_value, total_squared_value)
         for (size_t i = 0; i < points / 2; ++i)
         {
-
-            generateRandomPoint(random_point_vector1, random_point_vector2, assetPtrs, std_dev_from_mean, predicted_assets_prices, option_type, A, zeta_matrix, num_days_to_simulate);
+              // Generate random point
+            generateRandomPoint(random_point_vector1, random_point_vector2, assetPtrs, predicted_assets_prices, option_type, A, zeta_matrix, num_days_to_simulate);
 
               // Check if the random point vector is not empty
             if (random_point_vector1.size() != 0 && random_point_vector2.size() != 0)
             {
-                error = MonteCarloError::Success;
+                error   = MonteCarloError::Success;
                 result1 = 0.0;
                 result2 = 0.0;
 
@@ -90,7 +90,7 @@ std::pair<double, double> monteCarloPricePrediction(size_t points,
             else
             {
                 error = MonteCarloError::PointGenerationFailed;
-                i = points / 2;
+                i     = points / 2;
             }
         }
     }
@@ -117,18 +117,17 @@ std::pair<double, double> monteCarloPricePrediction(size_t points,
 void generateRandomPoint(std::vector<double> &random_point1,
                          std::vector<double> &random_point2,
                          const std::vector<const Asset *> &assetPtrs,
-                         const double std_dev_from_mean,
                          std::vector<double> &predicted_assets_prices,
                          const OptionType &option_type,
                          const std::vector<std::vector<double>> &A,
                          const std::vector<std::vector<double>> &zeta_matrix,
                          const uint num_days_to_simulate)
 {
-    double   T                    = 1.0;
-    double   r                    = 0.05;
-    double   dt                   = T / num_days_to_simulate;
-    uint32_t seed                 = 123456789;
-    
+    double   T    = 1.0;                       /**Time to maturity */
+    double   r    = 0.05;                      /**Risk-free rate */
+    double   dt   = T / num_days_to_simulate;  /**Time step */
+    uint32_t seed = 123456789;                 /**Seed for the random number generator */
+
     try
     {
         thread_local std::mt19937 eng(xorshift(seed));
@@ -141,15 +140,20 @@ void generateRandomPoint(std::vector<double> &random_point1,
             double prices1[num_days_to_simulate + 1];
             double prices2[num_days_to_simulate + 1];
 
+              // Asian option prices
             double asian_prices1 = 0.0;
             double asian_prices2 = 0.0;
-            prices1[0]           = assetPtrs[i]->getLastRealValue();
-            prices2[0]           = assetPtrs[i]->getLastRealValue();
+
+              // Initial price
+            prices1[0] = assetPtrs[i]->getLastRealValue();
+            prices2[0] = assetPtrs[i]->getLastRealValue();
 
             for (uint step = 1; step < num_days_to_simulate + 1; ++step)
             {
+                  // Perform the dot product to get the random number
                 double num = VVMult(A, i, zeta_matrix[step - 1]);
 
+                  // Calculate the price
                 prices1[step] = prices1[step - 1] * exp((r -
                                                          0.5 *
                                                              assetPtrs[i]->getReturnStdDev() *
@@ -164,7 +168,8 @@ void generateRandomPoint(std::vector<double> &random_point1,
                                                             dt -
                                                         sqrt(dt) *
                                                             num);
-                if (option_type == OptionType::Asian )
+                  // Calculate the Asian option prices
+                if (option_type == OptionType::Asian)
                 {
                     asian_prices1 += prices1[step];
                     asian_prices2 += prices2[step];
@@ -173,6 +178,7 @@ void generateRandomPoint(std::vector<double> &random_point1,
 
 #pragma omp critical
             {
+                  // Calculate the random point
                 if (option_type == OptionType::Asian)
                 {
                     random_point1[i] = asian_prices1 / num_days_to_simulate;
@@ -183,6 +189,7 @@ void generateRandomPoint(std::vector<double> &random_point1,
                     random_point1[i] = prices1[num_days_to_simulate];
                     random_point2[i] = prices2[num_days_to_simulate];
                 }
+                  // Calculate the predicted asset prices
                 predicted_assets_prices[i] += prices1[num_days_to_simulate] + prices2[num_days_to_simulate];
             }
         }

@@ -1,3 +1,8 @@
+/**
+ * @file option_parameters.hpp
+ * @brief This file contains declarations related to option parameters.
+ */
+
 #ifndef OPTION_PARAMETERS_
     #define OPTION_PARAMETERS_
 

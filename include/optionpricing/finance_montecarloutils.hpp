@@ -1,3 +1,8 @@
+/**
+ * @file finance_montecarloutils.hpp
+ * @brief This file contains declarations related to Monte Carlo simulation utilities for pricing options.
+ */
+
 #ifndef PROJECT_FINANCEMONTECARLOUTILS_HPP
     #define PROJECT_FINANCEMONTECARLOUTILS_HPP
 

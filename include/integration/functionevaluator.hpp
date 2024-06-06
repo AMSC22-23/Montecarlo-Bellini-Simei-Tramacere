@@ -1,3 +1,8 @@
+/**
+ * @file functionevaluator.hpp
+ * @brief This file contains the declaration of the function evaluator.
+ 
+ */
 #ifndef PROJECT_FUNCTIONEVALUATOR_
     #define PROJECT_FUNCTIONEVALUATOR_
 

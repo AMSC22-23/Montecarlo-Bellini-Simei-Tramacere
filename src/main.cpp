@@ -15,45 +15,44 @@
   // Main function
 int main()
 {
-    int choice;
-    bool validChoice = false;
+  int choice;
+  bool validChoice = false;
 
-    while (!validChoice)
+  while (!validChoice)
+  {
+      // Display the menu
+    std::cout << "What you want to do?\n1. Price an option\n2. Calculate an integral\nEnter choice (1 or 2): ";
+
+    std::cin >> choice;
+
+    if (std::cin.fail())
     {
-          // Display the menu
-        std::cout << "What you want to do?\n1. Price an option\n2. Calculate an integral\nEnter choice (1 or 2): ";
-
-
-        std::cin >> choice;
-
-        if (std::cin.fail())
-        {
-              // Clear the fail state
-            std::cin.clear();
-              // Clear the input buffer
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "Invalid input. Please enter a number." << std::endl;
-        }
-        else
-        {
-              // Check the choice
-            switch (choice)
-            {
-            case 1: 
-                  // Call the finance computation function
-                financeComputation();
-                validChoice = true;
-                break;
-            case 2: 
-                  // Call the integral calculator function
-                integralCalculator();
-                validChoice = true;
-                break;
-            default: 
-                std::cout << "Invalid choice. Please enter 1 or 2." << std::endl;
-                break;
-            }
-        }
+        // Clear the fail state
+      std::cin.clear();
+        // Clear the input buffer
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      std::cout << "Invalid input. Please enter a number." << std::endl;
     }
-    return 0;
+    else
+    {
+        // Check the choice
+      switch (choice)
+      {
+      case 1: 
+          // Call the finance computation function
+        financeComputation();
+        validChoice = true;
+        break;
+      case 2: 
+          // Call the integral calculator function
+        integralCalculator();
+        validChoice = true;
+        break;
+      default: 
+        std::cout << "Invalid choice. Please enter 1 or 2." << std::endl;
+        break;
+      }
+    }
+  }
+  return 0;
 }

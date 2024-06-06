@@ -8,20 +8,20 @@ HyperSphere::HyperSphere(size_t dim, double rad)
   // for the Monte Carlo method of the original project
 void HyperSphere::generateRandomPoint(std::vector<double> &random_point)
 {
-  bool point_within_sphere = false;
-  std::uniform_real_distribution<double> distribution(-radius, radius);
+    bool point_within_sphere = false;
+    std::uniform_real_distribution<double> distribution(-radius, radius);
 
-  while (!point_within_sphere)
-  {
-    double sum_of_squares = 0.0;
-
-    for (size_t i = 0; i < dimension; ++i)
+    while (!point_within_sphere)
     {
-      random_point[i] = distribution(eng);
+        double sum_of_squares = 0.0;
 
-      sum_of_squares += random_point[i] * random_point[i];
+        for (size_t i = 0; i < dimension; ++i)
+        {
+            random_point[i] = distribution(eng);
+
+            sum_of_squares += random_point[i] * random_point[i];
+        }
+
+        point_within_sphere = (sum_of_squares <= radius * radius);
     }
-
-    point_within_sphere = (sum_of_squares <= radius * radius);
-  }
 }

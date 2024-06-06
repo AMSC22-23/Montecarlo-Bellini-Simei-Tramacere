@@ -1,3 +1,8 @@
+  /**
+ * @file optionpricer.hpp
+ * @brief This file contains the declarationof the financeComputation function.
+ */
+
 #ifndef OPTION_PRICER_HPP
     #define OPTION_PRICER_HPP
 

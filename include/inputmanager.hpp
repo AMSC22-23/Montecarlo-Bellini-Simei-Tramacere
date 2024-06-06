@@ -1,3 +1,8 @@
+/**
+ * @file inputmanager.hpp
+ * @brief This file contains the declarations of functions related to input management.
+ */
+
 #ifndef INPUT_MANAGER_HPP
     #define INPUT_MANAGER_HPP
 
@@ -67,11 +72,7 @@ void readValidatedInput(const std::string &prompt, T &value, std::function<bool(
  * @param function A reference to the function to integrate
  * @param domain_type A reference to the domain type
  * @param hyper_rectangle_bounds A reference to the bounds of the hyperrectangle
- *
- * The function is the core of the original code, which is used to build the integral
- * over a chosen domain using the Monte Carlo method. The function reads the input from
- * the user and builds the integral over a chosen domain using the Monte Carlo method.
- */
+    */
 void buildIntegral(size_t &n, size_t &dim, double &rad, double &edge, std::string &function, std::string &domain_type, std::vector<double> &hyper_rectangle_bounds);
 
-#endif  // INPUT_MANAGER_HPP
+#endif

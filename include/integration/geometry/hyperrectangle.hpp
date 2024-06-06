@@ -1,3 +1,8 @@
+/**
+ * @file hyperrectangle.hpp
+ * @brief This file contains the declaration of the HyperRectangle class.
+ */
+
 #ifndef PROJECT_HYPERRECTANGLE_
     #define PROJECT_HYPERRECTANGLE_
 
@@ -11,9 +16,9 @@
 #include "../functionevaluator.hpp"
 #include "../../optionpricing/asset.hpp"
 
-  /**
+/**
  * @class HyperRectangle
- * @brief This class represents a hyperrectangle, which is a geometric shape that exists in a space with a large number of dimensions.
+ * @brief Represents a hyperrectangle, a geometric shape in a space with a large number of dimensions.
  *
  * A hyperrectangle is a generalization of a rectangle to an arbitrary number of dimensions.
  * It is a generalization of a hypercube.
@@ -21,24 +26,23 @@
 class HyperRectangle: public Geometry
 {
 public: 
-      /**
+    /**
      * @brief Construct a new HyperRectangle object
-     * @details Default constructor
-     * @param dim An integer representing the dimension of the hyperrectangle
-     * @param hyper_rectangle_bounds A vector of doubles representing the bounds of the hyperrectangle
+     * @param dim The dimension of the hyperrectangle
+     * @param hyper_rectangle_bounds Vector representing the bounds of the hyperrectangle
      */
     explicit HyperRectangle(size_t dim,
                             std::vector<double> &hyper_rectangle_bounds);
 
-      /**
+    /**
      * @brief Generate a random point inside the hyperrectangle
-     * @details The function generates a random point inside the hyperrectangle domain
+     * @details Generates a random point inside the hyperrectangle domain
      * in a parallel fashion using OpenMP following a uniform distribution.
-     * @param random_point A vector of doubles representing the random point
+     * @param random_point Vector to store the random point coordinates
      */
     void generateRandomPoint(std::vector<double> &random_point) override;
 
-      /**
+    /**
      * @brief Calculate the volume of the hyperrectangle
      * @details The volume of a hyperrectangle is given by the formula: 
      * volume = (b1 - a1) * (b2 - a2) * ... * (bn - an)
@@ -51,7 +55,7 @@ public:
         }
     }
 
-      /**
+    /**
      * @brief Get the volume of the hyperrectangle
      * @return The volume of the hyperrectangle
      */
@@ -60,7 +64,7 @@ public:
         return volume;
     }
 
-      /**
+    /**
      * @brief Get the dimension of the hyperrectangle
      * @return The dimension of the hyperrectangle
      */

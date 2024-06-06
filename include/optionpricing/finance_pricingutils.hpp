@@ -1,3 +1,8 @@
+/**
+ * @file finance_pricingutils.hpp
+ * @brief This file contains utility functions for option pricing in finance.
+ */
+
 #ifndef FINANCE_PRICINGUTILS_HPP
     #define FINANCE_PRICINGUTILS_HPP
 
@@ -12,11 +17,6 @@
 #include "finance_montecarlo.hpp"
 #include "optionparameters.hpp"
 #include "finance_enums.hpp"
-
-/**
- * @file finance_pricingutils.hpp
- * @brief This file contains utility functions for option pricing in finance.
- */
 
 /**
  * @brief Calculates the value of the standard normal distribution function.

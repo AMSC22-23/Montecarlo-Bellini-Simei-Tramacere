@@ -1,5 +1,5 @@
 #include "../../include/optionpricing/finance_montecarloutils.hpp"
- 
+
   // Calculate covariance between two assets
 double calculateCovariance(const Asset &asset1, const Asset &asset2, CovarianceError &error)
 {
@@ -102,6 +102,7 @@ std::vector<std::vector<double>> choleskyFactorization(const std::vector<std::ve
     return L;
 }
 
+  // Function to generate a metrix of random numbers from a normal distribution
 void fillZetaMatrix(std::vector<std::vector<double>> &zeta_matrix)
 {
     std::random_device rd;
@@ -116,6 +117,7 @@ void fillZetaMatrix(std::vector<std::vector<double>> &zeta_matrix)
     }
 }
 
+  // Function to compute a vector-vector multiplication
 double VVMult(const std::vector<std::vector<double>> &matrix, size_t rowIdx, const std::vector<double> &vector)
 {
     double result = 0.0;
@@ -126,6 +128,7 @@ double VVMult(const std::vector<std::vector<double>> &matrix, size_t rowIdx, con
     return result;
 }
 
+  // Function that shifts the seed
 uint32_t xorshift(uint32_t seed)
 {
     seed ^= seed << 13;

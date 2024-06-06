@@ -1,3 +1,8 @@
+/**
+ * @file hypercube.hpp
+ * @brief This file contains the declaration of the HyperCube class.
+ */
+
 #ifndef PROJECT_HYPERCUBE_
     #define PROJECT_HYPERCUBE_
 
@@ -9,9 +14,9 @@
 #include "geometry.hpp"
 #include "../functionevaluator.hpp"
 
-  /**
+/**
  * @class HyperCube
- * @brief This class represents a hypercube, which is a geometric shape that exists in a space with a large number of dimensions.
+ * @brief Represents a hypercube, a geometric shape in a space with a large number of dimensions.
  *
  * A hypercube is a generalization of a cube to an arbitrary number of dimensions.
  * It is a special case of a hyperrectangle.
@@ -19,23 +24,22 @@
 class HyperCube: public Geometry
 {
 public: 
-      /**
+    /**
      * @brief Construct a new HyperCube object
-     * @details Default constructor
-     * @param dim An integer representing the dimension of the hypercube
-     * @param edge A double representing the edge of the hypercube
+     * @param dim The dimension of the hypercube
+     * @param edge The edge length of the hypercube
      */
     explicit HyperCube(size_t dim, double edge);
 
-      /**
+    /**
      * @brief Generate a random point inside the hypercube
-     * @details The function generates a random point inside the hypercube domain
+     * @details Generates a random point inside the hypercube domain
      * in a parallel fashion using OpenMP following a uniform distribution.
-     * @param random_point A vector of doubles representing the random point
+     * @param random_point Vector to store the random point coordinates
      */
     void generateRandomPoint(std::vector<double> &random_point) override;
 
-      /**
+    /**
      * @brief Calculate the volume of the hypercube
      *
      * The volume of a hypercube is given by the formula: 
@@ -47,7 +51,7 @@ public:
             volume *= edge;
     }
 
-      /**
+    /**
      * @brief Get the volume of the hypercube
      * @return The volume of the hypercube
      */
@@ -56,7 +60,7 @@ public:
         return volume;
     }
 
-      /**
+    /**
      * @brief Get the dimension of the hypercube
      * @return An integer representing the dimension of the hypercube
      */

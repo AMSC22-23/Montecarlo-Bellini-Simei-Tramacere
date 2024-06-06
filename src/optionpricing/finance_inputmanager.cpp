@@ -2,64 +2,48 @@
 
 double logReturn(const double price, const double previous_price)
 {
-    return std::log(price/previous_price);
+    return std::log(price / previous_price);
 }
 
-  // Function to calculate Hyperrectangle integration bounds
-int setIntegrationBounds(std::vector<double> &integration_bounds,
-                         const std::vector<Asset> &assets,
-                         const int std_dev_from_mean /* = 24 */)
+  // Function to load assets from CSV files
+LoadAssetError loadAssets(const std::string &directory, std::vector<Asset> &assets, const AssetCountType &asset_count_type)
 {
-    try
-    {
-        size_t j = 0;
-        for (size_t i = 0; i < assets.size() * 2 - 1; i += 2)
-        {
-              // Calculate the integration bounds for each asset
-            integration_bounds[i]     = assets[j].getReturnMean() - std_dev_from_mean * assets[j].getReturnStdDev() + 1.0;
-            integration_bounds[i + 1] = assets[j].getReturnMean() + std_dev_from_mean * assets[j].getReturnStdDev() + 1.0;
-            j++;
-        }
-    }
-    catch (const std::exception &e)
-    {
-        return -1;
-    }
-    return 0;
-}
-
-// Function to load assets from CSV files
-LoadAssetError loadAssets(const std::string& directory, std::vector<Asset>& assets, const AssetCountType& asset_count_type) {
     std::string subdirectory;
 
-    // Determine subdirectory based on option type
-    switch (asset_count_type) {
-        case AssetCountType::Single:
-            subdirectory = "single_asset";
-            break;
-        case AssetCountType::Multiple:
-            subdirectory = "multi_asset";
-            break;
-        default:
-            std::cerr << "Invalid option type" << std::endl;
-            return LoadAssetError::DirectoryOpenError;
+      // Determine subdirectory based on option type
+    switch (asset_count_type)
+    {
+    case AssetCountType::Single: 
+        subdirectory = "single_asset";
+        break;
+    case AssetCountType::Multiple: 
+        subdirectory = "multi_asset";
+        break;
+    default: 
+        std::cerr << "Invalid option type" << std::endl;
+        return LoadAssetError::DirectoryOpenError;
     }
 
+      // Create the target directory path
     std::filesystem::path targetDirectory = std::filesystem::path(directory) / subdirectory;
 
-    try {
+    try
+    {
         bool validFileFound = false;
 
-        // Iterate over each entry in the subdirectory
-        for (const auto& entry : std::filesystem::directory_iterator(targetDirectory)) {
-            if (entry.is_regular_file() && entry.path().extension() == ".csv") {
+          // Iterate over each entry in the subdirectory
+        for (const auto &entry : std::filesystem::directory_iterator(targetDirectory))
+        {
+            if (entry.is_regular_file() && entry.path().extension() == ".csv")
+            {
                 validFileFound = true;
                 Asset asset;
                 std::string filename = entry.path().stem().string();
                 asset.setName(filename);
                 int csv_result = extrapolateCsvData(entry.path().string(), &asset);
 
-                if (csv_result == -1) {
+                if (csv_result == -1)
+                {
                     std::cout << "Error reading the file " << filename << std::endl;
                     return LoadAssetError::FileReadError;
                 }
@@ -68,10 +52,13 @@ LoadAssetError loadAssets(const std::string& directory, std::vector<Asset>& asse
             }
         }
 
-        if (!validFileFound) {
+        if (!validFileFound)
+        {
             return LoadAssetError::NoValidFiles;
         }
-    } catch (std::filesystem::filesystem_error& e) {
+    }
+    catch (std::filesystem::filesystem_error &e)
+    {
         std::cerr << "Could not open directory: " << e.what() << std::endl;
         return LoadAssetError::DirectoryOpenError;
     }

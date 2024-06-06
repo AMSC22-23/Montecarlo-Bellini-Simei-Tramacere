@@ -1,8 +1,9 @@
 #include "../../include/optionpricing/finance_pricingutils.hpp"
 
-  // Function that calculates the value of the standard normal distribution function
+  // Function to calculate the value of the standard normal distribution function
 double phi(const double x)
 {
+      // Constants for normal distribution calculation
     constexpr double RT2PI = 2.50662827463100;
     constexpr double SPLIT = 7.07106781186547;
     constexpr double N0    = 220.206867912376;
@@ -42,7 +43,7 @@ double phi(const double x)
     return x <= 0.0 ? c : 1 - c;
 }
 
-  // Function that writes the results of the option pricing to a file
+  // Function to write the results of option pricing to a file
 void writeResultsToFile(const std::vector<Asset> &assets,
                         const std::pair<double, double> &result,
                         const double &standard_error,
@@ -50,6 +51,7 @@ void writeResultsToFile(const std::vector<Asset> &assets,
                         const size_t &num_simulations,
                         const OptionType &option_type)
 {
+      // Open output file
     std::ofstream outputFile("output.txt", std::ios::app);
     outputFile.seekp(0, std::ios::end);
     bool isEmpty = (outputFile.tellp() == 0);
@@ -75,7 +77,7 @@ void writeResultsToFile(const std::vector<Asset> &assets,
         std::ostringstream formattedTimeStr;
         formattedTimeStr << dayOfWeek << " " << month << " " << day << " " << year << " " << timeOfDay;
 
-          // Write the results to output.txt
+          // Write asset details
         outputFile << "Generated on: " << formattedTimeStr.str() << "\n";
         outputFile << "==================================================================================================================================\n";
         outputFile << std::left << std::setw(22) << "Asset";
@@ -97,42 +99,50 @@ void writeResultsToFile(const std::vector<Asset> &assets,
         outputFile << std::left << std::setw(22) << "Option type" << "\n";
     }
 
-      // Write the results to output.txt
+      // Write results
     outputFile << std::left << std::setw(22) << num_simulations;
     outputFile << std::fixed << std::setprecision(6) << std::left << std::setw(22) << standard_error;
     outputFile << std::fixed << std::setprecision(6) << std::left << std::setw(22) << result.first;
-    outputFile << std::fixed << std::setprecision(6) << std::left << std::setw(22) << result.second * 1e-6 ;
+    outputFile << std::fixed << std::setprecision(6) << std::left << std::setw(22) << result.second * 1e-6;
     outputFile << std::left << std::setw(22) << option_type_s << "\n";
     outputFile.close();
 }
 
-  // Function that computes the Black-Scholes option price
+  // Function to compute the Black-Scholes option price
 double computeBlackScholesOptionPrice(const std::vector<const Asset *> &assetPtrs, const double &strike_price)
 {
-    double S     = 0.0;           // Stock price
-    double r     = 0.05;          // Risk-free rate
-    double sigma = 0.0;           // Volatility
-    double T     = 1;             // Time to maturity
-    double K     = strike_price;  // Strike price
+                              // Initialize variables
+    double S = 0.0;           // Stock price
+    double r = 0.05;          // Risk-free rate
+    double sigma = 0.0;       // Volatility
+    double T = 1;             // Time to maturity
+    double K = strike_price;  // Strike price
 
+      // Calculate stock price and volatility
     for (size_t i = 0; i < assetPtrs.size(); ++i)
     {
         S     += assetPtrs[i]->getLastRealValue();
         sigma += assetPtrs[i]->getReturnStdDev();
     }
+
+      // Calculate d1 and d2
     double d1 = (log(S / K) + (r + 0.5 * sigma * sigma) * T) / (sigma * sqrt(T));
     double d2 = d1 - sigma * sqrt(T);
+
+      // Calculate Black-Scholes option price
     return S * phi(d1) - K * exp(-r * T) * phi(d2);
 }
 
-  // Function to get user input and validate
+  // Function to get user input for option type
 OptionType getOptionTypeFromUser()
 {
     int        input  = 0;
     OptionType option = OptionType::Invalid;
 
+      // Prompt user for input
     std::cout << "\nSelect the option type:\n1. European\n2. Asian\nEnter choice (1 or 2): ";
 
+      // Validate user input
     while (true)
     {
         std::cin >> input;
@@ -153,14 +163,16 @@ OptionType getOptionTypeFromUser()
     return option;
 }
 
-  // Function to get user input for asset count type and validate
+  // Function to get user input for asset count type
 AssetCountType getAssetCountTypeFromUser()
 {
     int            input          = 0;
     AssetCountType assetCountType = AssetCountType::Invalid;
 
+      // Prompt user for input
     std::cout << "\nSelect the asset count type:\n1. Single\n2. Multiple\nEnter choice (1 or 2): ";
 
+      // Validate user input
     while (true)
     {
         std::cin >> input;
