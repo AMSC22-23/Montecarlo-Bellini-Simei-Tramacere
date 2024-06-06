@@ -4,29 +4,18 @@
 #include <chrono>
 #include <fstream>
 #include <iomanip>
-#include "../include/integration/geometry/hyperrectangle.hpp"
 #include "../include/optionpricing/asset.hpp"
 #include "../include/optionpricing/optionpricer.hpp"
 #include "../include/optionpricing/finance_montecarlo.hpp"
 #include "../include/optionpricing/optionparameters.hpp"
 #include "../include/optionpricing/finance_inputmanager.hpp"
 
-extern std::pair<double, double> kernel_wrapper(long long int N, const std::string &function, HyperRectangle &hyperrectangle,
-                                                const std::vector<const Asset *> &assetPtrs /* = std::vector<const Asset*>() */,
-                                                double std_dev_from_mean /* = 5.0 */, double *variance /* = nullptr */,
-                                                std::vector<double> coefficients, double strike_price, long long int seed);
-// extern std::pair<double, double> kernel_wrapper();
+extern std::pair<double, double> kernel_wrapper(long long int N, const std::string &function,
+                                                const std::vector<const Asset *> &assetPtrs , double *variance ,
+                                                std::vector<double> coefficients, double strike_price,
+                                                OptionType option_type);
 
-// Xorshift function
-uint32_t xorshift(uint32_t seed)
-{
-    seed ^= seed << 13;
-    seed ^= seed >> 17;
-    seed ^= seed << 5;
-    return seed;
-}
-
-OptionType getOptionTypeFromUser()
+OptionType cuda_getOptionTypeFromUser()
 {
     int input = 0;
     OptionType option = OptionType::Invalid;
@@ -54,7 +43,7 @@ OptionType getOptionTypeFromUser()
 }
 
 // Function to get user input for asset count type and validate
-AssetCountType getAssetCountTypeFromUser()
+AssetCountType cuda_getAssetCountTypeFromUser()
 {
     int input = 0;
     AssetCountType assetCountType = AssetCountType::Invalid;
@@ -90,20 +79,25 @@ int main(int argc, char **argv)
     // long long int N = 1e8;
     long long int N = 1e6;
     double strike_price = 0.0;
-    int std_dev_from_mean = 24;
     double variance = 0.0;
-    size_t num_iterations = 5;
+    size_t num_iterations = 10;
 
     std::vector<Asset> assets;
 
-    OptionType option_type = getOptionTypeFromUser();
+    OptionType option_type = cuda_getOptionTypeFromUser();
     if (option_type == OptionType::Invalid)
     {
         std::cerr << "\nInvalid option type" << std::endl;
         exit(1);
     }
 
-    AssetCountType asset_count_type = getAssetCountTypeFromUser();
+
+    if (option_type == OptionType::Asian)
+    {
+        N = 1e6;
+    }
+
+    AssetCountType asset_count_type = cuda_getAssetCountTypeFromUser();
     if (asset_count_type == AssetCountType::Invalid)
     {
         std::cerr << "\nInvalid asset count type" << std::endl;
@@ -147,16 +141,8 @@ int main(int argc, char **argv)
     auto function = function_pair.first;
     auto coefficients = function_pair.second;
 
-    std::vector<double> integration_bounds(assets.size() * 2);
-    if (getIntegrationBounds(integration_bounds, assets, std_dev_from_mean) == -1)
-    {
-        std::cout << "Error setting the integration bounds" << std::endl;
-        return -1;
-    }
 
-    HyperRectangle hyperrectangle(assets.size(), integration_bounds);
-
-    uint32_t seed = 123456789;
+   
     std::pair<double, double> result;
     std::pair<double, double> result_temp;
     result.first = 0.0;
@@ -164,11 +150,8 @@ int main(int argc, char **argv)
 
     for (size_t i = 0; i < num_iterations; ++i)
     {
-        seed = xorshift(seed);
-        std::cout << "=============================Iteration: " << i << std::endl;
-        std::cout << "Seed: " << seed << std::endl;
-        result_temp = kernel_wrapper(N, function, hyperrectangle, assetPtrs, std_dev_from_mean, &variance,
-                                     coefficients, strike_price, seed);
+        result_temp = kernel_wrapper(N, function, assetPtrs, &variance,
+                                     coefficients, strike_price, option_type);
         result.first += result_temp.first;
         result.second += result_temp.second;
     }
@@ -201,12 +184,7 @@ int main(int argc, char **argv)
 
         // Write additional information to the file
         outputFile << "The function is: " << function << "\n";
-        outputFile << "The integration bounds are: "
-                   << "\n";
-        for (size_t i = 0; i < integration_bounds.size(); i += 2)
-        {
-            outputFile << "[" << integration_bounds[i] << ", " << integration_bounds[i + 1] << "]\n";
-        }
+        
         outputFile << "=============================================================================================\n";
 
         outputFile << std::left << std::setw(15) << "Points";
@@ -221,6 +199,7 @@ int main(int argc, char **argv)
     outputFile << std::fixed << std::setprecision(6) << std::left << std::setw(15) << variance;
     outputFile << std::fixed << std::setprecision(6) << std::left << std::setw(15) << result.first;
     outputFile << std::fixed << std::setprecision(6) << std::left << std::setw(15) << result.second * 1e-6 << "\n";
+
 
     // Close the output file stream
     outputFile.close();
