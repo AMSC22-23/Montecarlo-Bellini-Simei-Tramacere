@@ -10,6 +10,7 @@ extern "C++"
 #include "../include/optionpricing/finance_inputmanager.hpp"
 }
 
+// Function to calculate the covariance between two assets
 float cuda_calculateCovariance(const Asset &asset1, const Asset &asset2, CovarianceError &error)
 {
     float covariance = 0.0;
@@ -42,6 +43,7 @@ float cuda_calculateCovariance(const Asset &asset1, const Asset &asset2, Covaria
     return covariance;
 }
 
+// Wrapper for the CUDA functions to check for errors
 #define gpuErrchk(ans)                        \
     {                                         \
         gpuAssert((ans), __FILE__, __LINE__); \
@@ -56,6 +58,7 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort =
     }
 }
 
+// Function to calculate the phi function
 float cuda_phi(float x)
 {
     static const float RT2PI = sqrt(4.0 * acos(0.0));
@@ -102,41 +105,46 @@ float cuda_phi(float x)
         return 1 - c;
 }
 
+// CUDA kernel to price the European option
 __global__ void priceEuropeanOption(float *total_payoff, float *total_squared_value,
                                     const float *assets_returns, const float *assets_std_devs,
                                     long long int n, float *assets_closing_values, int strike_price,
                                     float *predicted_assets_prices, int num_assets,
                                     float *matrix, float *vector, int num_days_to_simulate)
 {
-
+    // Calculate the thread id
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
 
+    // Check if the thread id is less than the number of simulations
     if (tid < n)
     {
 
         float payoff_function1 = 0.0;
         float payoff_function2 = 0.0;
-        float dt = 1.0 / num_days_to_simulate;
+        float dt = 1.0 / num_days_to_simulate; // Time step
         float prices1[253];
         float prices2[253];
-        float r = 0.05;
-        float Z = 0.0;
+        float r = 0.05; // Risk-free rate
+        float Z = 0.0;  // Random gaussian variable
 
+        // Loop over the assets
         for (size_t asset_idx = 0; asset_idx < num_assets; asset_idx++)
         {
 
             prices1[0] = assets_closing_values[asset_idx];
             prices2[0] = assets_closing_values[asset_idx];
-            // printf( "prices1[0] : %f prices2[0] : %f \n", prices1[0], prices2[0]);
 
+            // Loop over the days to simulate
             for (uint step = 1; step < num_days_to_simulate + 1; ++step)
             {
+                // Calculate the random gaussian variable
                 Z = 0.0;
                 for (size_t i = 0; i < num_assets; ++i)
                 {
                     Z += matrix[asset_idx * num_assets + i] * vector[(step - 1) * num_assets + i];
                 }
 
+                // Calculate the prices
                 prices1[step] = prices1[step - 1] * exp((r - 0.5 * assets_std_devs[asset_idx] *
                                                                  assets_std_devs[asset_idx]) *
                                                             dt -
@@ -151,11 +159,13 @@ __global__ void priceEuropeanOption(float *total_payoff, float *total_squared_va
             payoff_function1 += prices1[num_days_to_simulate];
             payoff_function2 += prices2[num_days_to_simulate];
 
+            // Calculate the predicted asset prices using atomic operations
             atomicAdd(&predicted_assets_prices[asset_idx], (prices1[num_days_to_simulate] + prices2[num_days_to_simulate]) / 2);
             atomicAdd(&total_squared_value[asset_idx],
                       (prices1[num_days_to_simulate] * prices1[num_days_to_simulate] + prices2[num_days_to_simulate] * prices2[num_days_to_simulate])/2);
         }
 
+        // Calculate the payoff of the option
         if (payoff_function1 > strike_price)
             payoff_function1 -= strike_price;
         else
@@ -170,15 +180,17 @@ __global__ void priceEuropeanOption(float *total_payoff, float *total_squared_va
     }
 }
 
+// CUDA kernel to price the Asian option
 __global__ void priceAsianOption(float *total_payoff, float *total_squared_value,
                                  const float *assets_returns, const float *assets_std_devs,
                                  long long int n, float *assets_closing_values, int strike_price,
                                  float *predicted_assets_prices, int num_assets,
                                  float *matrix, float *vector, int num_days_to_simulate)
 {
-
+    // Calculate the thread id
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
 
+    // Check if the thread id is less than the number of simulations
     if (tid < n)
     {
 
@@ -186,26 +198,30 @@ __global__ void priceAsianOption(float *total_payoff, float *total_squared_value
         float payoff_function2 = 0.0;
         float mean1 = 0.0;
         float mean2 = 0.0;
-        float dt = 1.0 / num_days_to_simulate;
+        float dt = 1.0 / num_days_to_simulate; // Time step
         float prices1[253];
         float prices2[253];
-        float r = 0.05;
-        float Z = 0.0;
+        float r = 0.05; // Risk-free rate
+        float Z = 0.0;  // Random gaussian variable
 
+        // Loop over the assets
         for (size_t asset_idx = 0; asset_idx < num_assets; asset_idx++)
         {
 
             prices1[0] = assets_closing_values[asset_idx];
             prices2[0] = assets_closing_values[asset_idx];
 
+            // Loop over the days to simulate
             for (uint step = 1; step < num_days_to_simulate + 1; ++step)
             {
+                // Calculate the random gaussian variable
                 Z = 0.0;
                 for (size_t i = 0; i < num_assets; ++i)
                 {
                     Z += matrix[asset_idx * num_assets + i] * vector[(step - 1) * num_assets + i];
                 }
 
+                // Calculate the prices
                 prices1[step] = prices1[step - 1] * exp((r - 0.5 * assets_std_devs[asset_idx] *
                                                                  assets_std_devs[asset_idx]) *
                                                             dt -
@@ -224,11 +240,13 @@ __global__ void priceAsianOption(float *total_payoff, float *total_squared_value
             payoff_function1 += mean1;
             payoff_function2 += mean2;
 
+            // Calculate the predicted asset prices using atomic operations
             atomicAdd(&predicted_assets_prices[asset_idx], (prices1[num_days_to_simulate] + prices2[num_days_to_simulate]) / 2);
             atomicAdd(&total_squared_value[asset_idx],
                       (prices1[num_days_to_simulate] * prices1[num_days_to_simulate] + prices2[num_days_to_simulate] * prices2[num_days_to_simulate]) / 2);
         }
 
+        // Calculate the payoff of the option
         if (payoff_function1 > strike_price)
             payoff_function1 -= strike_price;
         else
@@ -243,6 +261,7 @@ __global__ void priceAsianOption(float *total_payoff, float *total_squared_value
     }
 }
 
+// CUDA kernel to print the function and coefficients
 __global__ void printFunction(long long int n, char *function, const double *coefficients, int number_of_coefficients)
 {
     printf("Function: %s\n", function);
@@ -254,22 +273,27 @@ __global__ void printFunction(long long int n, char *function, const double *coe
     printf("Number of coefficients: %d\n", number_of_coefficients);
 }
 
+// Wrapper for the CUDA kernel
 extern std::pair<double, double> kernel_wrapper(long long int n, const std::string &function,
                                                 const std::vector<const Asset *> &assetPtrs, double *variance,
                                                 std::vector<double> coefficients, double strike_price, OptionType option_type)
 {
+    // Start the timer
     auto start = std::chrono::high_resolution_clock::now();
+
+    // Set the number of threads per block and the number of blocks
     dim3 threads_per_block = 256;
     dim3 number_of_blocks = (n + threads_per_block.x - 1) / threads_per_block.x;
 
+    // Get the number of assets and the number of days to simulate
     uint num_assets = assetPtrs.size();
     uint num_days_to_simulate = 1;
 
-    double S = 0.0;
-    double r = 0.05;
-    double sigma = 0.0;
-    double T = 1;
-    double BS_option_price = 0.0;
+    double S = 0.0; // stock price
+    double r = 0.05;    // Risk-free rate
+    double sigma = 0.0; // Volatility
+    double T = 1;    // Time to maturity
+    double BS_option_price = 0.0;   // Black-Scholes option price
 
     // Create and copy function and coefficients to device
     char *d_function;
@@ -287,6 +311,7 @@ extern std::pair<double, double> kernel_wrapper(long long int n, const std::stri
     CovarianceError cov_error;
     cov_error = CovarianceError::Success;
 
+    // Calculate the covariance matrix
     size_t numAssets = assetPtrs.size();
     float covarianceMatrix[num_assets][num_assets];
 
@@ -312,6 +337,7 @@ extern std::pair<double, double> kernel_wrapper(long long int n, const std::stri
         return std::make_pair(0.0, 0.0);
     }
 
+    // Calculate the Cholesky decomposition
     float A[num_assets][num_assets];
 
     for (uint c = 0; c < num_assets; ++c)
@@ -351,6 +377,7 @@ extern std::pair<double, double> kernel_wrapper(long long int n, const std::stri
         }
     }
 
+    // Compute the value to be used in the pricing
     float zeta_matrix[num_days_to_simulate][num_assets];
     std::random_device rd;
     std::mt19937 eng(rd());
@@ -363,6 +390,7 @@ extern std::pair<double, double> kernel_wrapper(long long int n, const std::stri
         }
     }
 
+    // Copy the covariance matrix and zeta matrix to the device
     float *d_zeta_matrix;
     gpuErrchk(cudaMalloc((void **)&d_zeta_matrix, num_days_to_simulate * num_assets * sizeof(float)));
     gpuErrchk(cudaMemcpy(d_zeta_matrix, zeta_matrix, num_days_to_simulate * num_assets * sizeof(float), cudaMemcpyHostToDevice));
@@ -379,6 +407,7 @@ extern std::pair<double, double> kernel_wrapper(long long int n, const std::stri
     gpuErrchk(cudaMalloc((void **)&d_assets_std_devs, num_assets * sizeof(float)));
     gpuErrchk(cudaMalloc((void **)&d_assets_last_values, num_assets * sizeof(float)));
 
+    // Copy the assets data to the device
     for (size_t i = 0; i < num_assets; i++)
     {
         float return_mean = static_cast<float>(assetPtrs[i]->getReturnMean());
@@ -391,14 +420,17 @@ extern std::pair<double, double> kernel_wrapper(long long int n, const std::stri
         gpuErrchk(cudaMemcpy(&d_assets_last_values[i], &last_value, sizeof(float), cudaMemcpyHostToDevice));
     }
 
+    // Allocate memory for the total squared value and total payoff
     float *d_total_squared_value, *d_total_payoff;
     gpuErrchk(cudaMalloc(&d_total_squared_value, num_assets * sizeof(float)));
     gpuErrchk(cudaMalloc(&d_total_payoff, 1000000 * sizeof(float)));
 
+    // Allocate memory for the predicted asset prices
     float predicted_assets_prices[num_assets];
     float *d_predicted_assets_prices;
     gpuErrchk(cudaMalloc(&d_predicted_assets_prices, num_assets * sizeof(float)));
 
+    // Call the CUDA kernel to price the option
     if (option_type == OptionType::European)
     {
         num_days_to_simulate = 1;
@@ -417,8 +449,9 @@ extern std::pair<double, double> kernel_wrapper(long long int n, const std::stri
                                                                   d_predicted_assets_prices, num_assets,
                                                                   d_A, d_zeta_matrix, num_days_to_simulate);
     }
-    cudaDeviceSynchronize();
+    cudaDeviceSynchronize();    // Wait for the kernel to finish
 
+    // Copy the results back to the host
     float host_total_squared_value[num_assets];
     gpuErrchk(cudaMemcpy(host_total_squared_value, d_total_squared_value, num_assets * sizeof(float), cudaMemcpyDeviceToHost));
 
@@ -430,6 +463,7 @@ extern std::pair<double, double> kernel_wrapper(long long int n, const std::stri
 
     float total_squared_value = 0.0;
 
+    // Calculate the predicted asset prices
     for (size_t i = 0; i < num_assets; i++)
     {
         total_squared_value += (host_total_squared_value[i]);
@@ -437,6 +471,7 @@ extern std::pair<double, double> kernel_wrapper(long long int n, const std::stri
         std::cout << "The predicted future price (30 days) of one " << assetPtrs[i]->getName() << " stock is " << predicted_assets_prices[i] << std::endl;
     }
 
+    // Calculate the option payoff
     float option_payoff = 0.0;
     for (size_t i = 0; i < 1000000; i++)
         option_payoff += total_payoff[i] / n;
@@ -463,7 +498,7 @@ extern std::pair<double, double> kernel_wrapper(long long int n, const std::stri
     std::cout << "--------->option payoff: " << option_payoff << std::endl;
     std::cout << "strike price: " << strike_price << std::endl;
 
-
+    // Calculate the Black-Scholes option price if the option is European
     if (option_type == OptionType::European)
     {        
         for (size_t i = 0; i < assetPtrs.size(); ++i)
@@ -478,6 +513,7 @@ extern std::pair<double, double> kernel_wrapper(long long int n, const std::stri
         std::cout << "The option price calculated via Black-Scholes model is " << BS_option_price << std::endl;
     }
 
+    // Stop the timer
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
     cudaDeviceSynchronize();
