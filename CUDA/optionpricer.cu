@@ -516,7 +516,6 @@ extern std::pair<double, double> kernel_wrapper(long long int n, const std::stri
     // Stop the timer
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-    cudaDeviceSynchronize();
 
     return std::make_pair(option_payoff, static_cast<double>(duration.count()));
 }
